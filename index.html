@@ -326,6 +326,23 @@ details ul{padding-left:18px}
 .kucuk-dugme{font-size:12px;padding:0 0 0 6px}
 .gc-numune{grid-template-columns:minmax(200px,230px) repeat(4,minmax(140px,1fr))}
 @media (max-width:1000px){.gc-numune{grid-template-columns:1fr 1fr}.gc-numune .tarih-alani{grid-column:1/-1;max-width:260px}}
+
+/* Dolum kaydı ayrıntısı ve analiz eşleştirme */
+.kayit-tablo tr.secili>td{background:var(--hat-acik)}
+.detay-satir>td{white-space:normal;padding:0 0 14px;background:var(--hat-acik)}
+.kayit-detay{position:sticky;left:0;box-sizing:border-box;width:calc(var(--gorunen,100%) - 2px);background:var(--panel);border:1px solid var(--cizgi);border-top:3px solid var(--hat);padding:14px 16px 12px}
+.kayit-tablo td:nth-child(4){white-space:normal;min-width:180px;max-width:280px}
+.kd-ust{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:8px 20px;margin-bottom:6px}
+.kd-baslik{font-family:var(--gosterge);font-weight:600;font-size:20px}
+.kd-analiz{display:flex;align-items:center;gap:14px}
+.kd-bilgi{margin-bottom:10px}
+.kd-ozet{margin:6px 0 8px;max-width:760px}
+.kayit-detay table td,.kayit-detay table th{white-space:nowrap}
+.gc-kayit-sec{margin:10px 0 6px}
+.gc-kayit-sec .arama{max-width:360px;margin-bottom:8px}
+.gc-kayit-tablo{width:auto;min-width:min(100%,720px)}
+.gc-kayit-tablo input{width:17px;height:17px;accent-color:var(--hat)}
+.gc-kayit-sec .kaydet-alt{margin-top:8px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media print{.kontrol{break-inside:avoid}.ust .ayarlar,.sekmeler,.girdi,.kaydet,details,.dugmeler,.filtre,.sil,.tehlikeli,.not-form,.not-dugmeler,.tost{display:none!important}.duzen{display:block}body{background:#fff}}
 </style>
@@ -1425,7 +1442,7 @@ function hesaplaTek(){
   if(t.kalan){ const kp=num(t.kP), kt=num(t.kT); if(isNaN(kp)||isNaN(kt)) return hata('Kalan gaz basıncı ve sıcaklığını girin.'); kalan={P_abs:absPa(kp),T:kt+273.15}; if(!(kalan.P_abs>0)) kalan=null; }
   const sonuc=basincliHesap({comps,V,Pr,T,hedef,hT,tT,tol,kalan,ad:GAZ[g].ad,parca:comps.length>1});
   if(!sonuc) return;
-  sonHesap=bosP?null:{gaz:GAZ[g].ad+(g==='SAIR'?` (%${fmt(num(t.o2),1)} O₂)`:''),yontem:'Basınç',V,P:`${fmt(Pr,1)} ${birimP()}`,T,m3:sonuc.m3,kg:sonuc.kg,bilesen:g==='SAIR'?bilesenMetni(sonuc.parts):''};
+  sonHesap=bosP?null:{gaz:GAZ[g].ad+(g==='SAIR'?` (%${fmt(num(t.o2),1)} O₂)`:''),yontem:'Basınç',V,P:`${fmt(Pr,1)} ${birimP()}`,T,m3:sonuc.m3,kg:sonuc.kg,bilesen:g==='SAIR'?bilesenMetni(sonuc.parts):'',Pdeger:Pr,comps:comps.map(c=>({key:c.key,x:c.x})),parts:parcaOzet(sonuc.parts),kalan};
 }
 
 // Basınçlı tek gaz ve basınçla karışım için ortak akış
@@ -1518,7 +1535,7 @@ function hesaplaSivi(){
     if(r) h+=`<dl class="ayrinti">`+(!isNaN(once)?satirD('Tüpteki toplam içerik',`${fmt(r.contentKg,3)} kg, ${fmt(r.m3Content,3)} m³`):'')+`</dl>`;
     h+=(r?kaydetAlani():'')+yontem();
     $('#sonuc').innerHTML=h;
-    sonHesap=r?{gaz:GAZ[g].ad,yontem:'Tartım',V:'',P:'',T:'',m3:r.m3,kg:r.netKg}:null;
+    sonHesap=r?{gaz:GAZ[g].ad,yontem:'Tartım',V:'',P:'',T:'',m3:r.m3,kg:r.netKg,comps:[{key:g,x:1}],parts:[{key:g,x:1,kg:r.netKg,m3:r.m3}]}:null;
     return;
   }
   // Manometre kontrolü
@@ -1574,7 +1591,7 @@ function hesaplaSivi(){
   }
   h+=yontem();
   $('#sonuc').innerHTML=h;
-  sonHesap=r?{gaz:GAZ[g].ad,yontem:'Tartım',V,P:isNaN(Pok)?'':`${fmt(Pok,1)} ${birimP()}`,T,m3:r.m3,kg:r.netKg}:null;
+  sonHesap=r?{gaz:GAZ[g].ad,yontem:'Tartım',V,P:isNaN(Pok)?'':`${fmt(Pok,1)} ${birimP()}`,T,m3:r.m3,kg:r.netKg,comps:[{key:g,x:1}],parts:[{key:g,x:1,kg:r.netKg,m3:r.m3}]}:null;
 }
 
 function hesaplaKar(){
@@ -1594,7 +1611,7 @@ function hesaplaKar(){
     if(k.kalan){ const kp=num(k.kP), kt=num(k.kT); if(isNaN(kp)||isNaN(kt)) return hata('Kalan gaz basıncı ve sıcaklığını girin.'); kalan={P_abs:absPa(kp),T:kt+273.15}; if(!(kalan.P_abs>0)) kalan=null; }
     const r=basincliHesap({comps,V,Pr,T,hedef,hT,tT,tol,kalan,parca:true});
     if(!r) return;
-    sonHesap=isNaN(Pr)?null:{gaz:karisimAdi(comps),yontem:'Basınç',V,P:`${fmt(Pr,1)} ${birimP()}`,T,m3:r.m3,kg:r.kg,bilesen:bilesenMetni(r.parts)};
+    sonHesap=isNaN(Pr)?null:{gaz:karisimAdi(comps),yontem:'Basınç',V,P:`${fmt(Pr,1)} ${birimP()}`,T,m3:r.m3,kg:r.kg,bilesen:bilesenMetni(r.parts),Pdeger:Pr,comps:comps.map(c=>({key:c.key,x:c.x})),parts:parcaOzet(r.parts),kalan};
   }else if(k.mod==='siparis'){
     hesaplaSiparis();
   }else{
@@ -1634,9 +1651,10 @@ function hesaplaKar(){
     h+=`<p class="bilgi">Kütle ve m³ doğrudan tartıma dayanır; basınç yalnızca kontrol içindir.</p>`;
     h+=kaydetAlani()+yontem();
     $('#sonuc').innerHTML=h;
-    sonHesap={gaz:karisimAdi(items.map((i,n)=>({key:i.key,x:r.parts[n].x}))),yontem:'Tartım',V,P:oku!=null?`${fmt(Pok,1)} ${birimP()}`:'',T,m3:r.m3,kg:r.kg,bilesen:bilesenMetni(r.parts)};
+    sonHesap={gaz:karisimAdi(items.map((i,n)=>({key:i.key,x:r.parts[n].x}))),yontem:'Tartım',V,P:oku!=null?`${fmt(Pok,1)} ${birimP()}`:'',T,m3:r.m3,kg:r.kg,bilesen:bilesenMetni(r.parts),comps:r.parts.map(p=>({key:p.key,x:p.x})),parts:parcaOzet(r.parts)};
   }
 }
+function parcaOzet(parts){ return parts.map(p=>({key:p.key,x:p.x,kg:p.kg,m3:p.m3})); }
 function bilesenMetni(parts){ return parts.map(p=>`${GAZ[p.key].f} ${fmt(p.kg,3)} kg / ${fmt(p.m3,3)} m³`).join('; '); }
 function hesaplaSiparis(){
   const k=S.kar, R=ref();
@@ -1674,7 +1692,7 @@ function hesaplaSiparis(){
   h+=kaydetAlani()+yontem();
   $('#sonuc').innerHTML=h;
   S.kar.sonTasarim=r;
-  sonHesap={gaz:karisimAdi(r.comps),yontem:'Sipariş',V,P:`${fmt(P,1)} ${birimP()} (hedef)`,T:hT,m3:r.m3,kg:r.kg,bilesen:bilesenMetni(r.parts)};
+  sonHesap={gaz:karisimAdi(r.comps),yontem:'Sipariş',V,P:`${fmt(P,1)} ${birimP()} (hedef)`,T:hT,m3:r.m3,kg:r.kg,bilesen:bilesenMetni(r.parts),comps:r.comps.map(c=>({key:c.key,x:c.x})),parts:parcaOzet(r.parts)};
 }
 function karisimAdi(comps){
   const s=[...comps].sort((a,b)=>b.x-a.x);
@@ -1882,6 +1900,96 @@ function bildir(m,geriAl){
 }
 document.addEventListener('click',e=>{ if(e.target.id==='geri-al' && bildir.geriAl){ const f=bildir.geriAl; bildir.geriAl=null; f(); document.getElementById('bildirim-genel').classList.remove('acik'); } });
 
+// ---------- Dolum kaydı ile GC analizi eşleştirme ----------
+const tupAnahtari=v=>String(v||'').trim().toLocaleUpperCase('tr-TR').replace(/\s+/g,'');
+function trSayi(v){ const t=String(v??'').trim(); if(!t) return NaN; return Number(t.replace(/\./g,'').replace(',','.')); }
+function analizIndeksi(){
+  const m=new Map();
+  for(const a of S.analizler){ const seriler=new Set([a.seriNo,...(a.tupler||[]).map(t=>t.seri)].map(tupAnahtari).filter(Boolean)); for(const k of seriler){ if(!m.has(k)) m.set(k,[]); m.get(k).push(a); } }
+  return m;
+}
+function dolumIndeksi(){ const m=new Map(); for(const r of S.kayit){ const k=tupAnahtari(r.tupNo); if(!k) continue; if(!m.has(k)) m.set(k,[]); m.get(k).push(r); } return m; }
+const ESNEKLIK=6*3600e3; // analiz tarihi dolum kaydından en fazla 6 saat önce görünebilir (saat girişi farkları)
+function kayitAnalizi(r,aIdx,dIdx){
+  const k=tupAnahtari(r.tupNo); if(!k) return null;
+  const adaylar=aIdx.get(k); if(!adaylar) return null;
+  const t=olcumZamani(r);
+  const sonraki=(dIdx.get(k)||[]).filter(x=>x.id!==r.id).map(olcumZamani).filter(z=>z>t).sort((a,b)=>a-b)[0]??Infinity;
+  const l=adaylar.filter(a=>olcumZamani(a)>=t-ESNEKLIK && olcumZamani(a)<sonraki).sort((a,b)=>olcumZamani(b)-olcumZamani(a));
+  return l.length?{analiz:l[0],adet:l.length}:null;
+}
+function analizinDolumu(a,seri,dIdx){
+  const l=(dIdx.get(tupAnahtari(seri))||[]).filter(r=>olcumZamani(r)<=olcumZamani(a)+ESNEKLIK).sort((x,y)=>olcumZamani(y)-olcumZamani(x));
+  return l[0]||null;
+}
+function sonDolumKaydi(seri){ const k=tupAnahtari(seri); if(!k) return null; return S.kayit.filter(r=>tupAnahtari(r.tupNo)===k).sort((a,b)=>olcumZamani(b)-olcumZamani(a))[0]||null; }
+function kayitBasinci(r){
+  let v=r.Pdeger, u=r.olcum; const patm=r.patm||S.patm;
+  if(v==null||v===''||isNaN(v)){ const m=/(-?[\d.,]+)\s*bar\s*([ga])/.exec(r.P||''); if(!m) return null; v=trSayi(m[1]); u=m[2]; }
+  if(!isFinite(v)) return null;
+  return (u==='a'?v:v+patm)*1e5;
+}
+function kayitBilesimi(r){
+  if(r.comps&&r.comps.length) return {comps:r.comps,parts:r.parts||null};
+  if(r.bilesen){
+    const parts=[];
+    for(const seg of r.bilesen.split(';')){ const m=/^\s*(.+?)\s+([\d.,]+)\s*kg\s*\/\s*([\d.,]+)\s*m³\s*$/.exec(seg); if(!m) continue; const key=Object.keys(GAZ).find(k=>GAZ[k].f===m[1].trim()); if(key) parts.push({key,kg:trSayi(m[2]),m3:trSayi(m[3])}); }
+    if(parts.length){ const n=parts.map(p=>p.kg/G.molarMass(p.key)); const N=n.reduce((a,b)=>a+b,0); parts.forEach((p,i)=>{ p.x=n[i]/N; }); return {comps:parts.map(p=>({key:p.key,x:p.x})),parts}; }
+  }
+  const key=Object.keys(GAZ).find(k=>GAZ[k].ad===r.gaz);
+  if(key&&key!=='SAIR') return {comps:[{key,x:1}],parts:[{key,x:1,kg:r.kg,m3:r.m3}]};
+  return {comps:null,parts:null};
+}
+function kayitReferansi(r){ const k=r.refKey&&REF[r.refKey]?r.refKey:(Object.keys(REF).find(x=>REF[x].ad===r.ref)||S.ref); return REF[k]; }
+function analizeGoreIcerik(r,a){
+  const x=a.sonuc.filter(q=>q.sonuc>0).map(q=>({key:q.key,x:q.sonuc/100}));
+  const ref=kayitReferansi(r);
+  let parts=null, temel='';
+  if(r.yontem==='Basınç' && r.V>0 && isFinite(r.T) && !x.some(c=>c.key==='C2H2')){
+    const Pa=kayitBasinci(r);
+    if(Pa>0){ try{ const q=C.byPressure({comps:x,V_L:r.V,P_abs:Pa,Pg_bar:Pa/1e5-(r.patm||S.patm),T:r.T+273.15,ref,residual:r.kalan||null,target15_abs:null}); if(!q.error){ parts=q.parts.map(p=>({key:p.key,x:p.x,kg:p.kg,m3:p.m3})); temel='basinc'; } }catch(_){} }
+  }
+  if(!parts && r.kg>0){
+    const Mmix=x.reduce((t,c)=>t+c.x*G.molarMass(c.key),0), n=r.kg/Mmix;
+    parts=x.map(c=>({key:c.key,x:c.x,kg:n*c.x*G.molarMass(c.key),m3:n*c.x*C.vref(c.key,ref)})); temel='kutle';
+  }
+  return {parts,temel,ref};
+}
+function detayGenisligi(){ const kap=document.querySelector('#kayit-govde .tablo-kap'); if(kap) kap.style.setProperty('--gorunen',kap.clientWidth+'px'); }
+window.addEventListener('resize',()=>{ clearTimeout(detayGenisligi.z); detayGenisligi.z=setTimeout(detayGenisligi,120); });
+function kayitDetayHtml(r,link){
+  const pl=kayitBilesimi(r);
+  let h=`<div class="kayit-detay"><div class="kd-ust"><div><div class="yan">Dolum ayrıntısı</div><div class="kd-baslik">${esc(r.tupNo||'Tüp no girilmemiş')}${r.musteri?` <span class="yan">${esc(r.musteri)}</span>`:''}</div></div>`;
+  if(link){ const a=link.analiz; h+=`<div class="kd-analiz">${a.genel===true?'<span class="etiket-uygun">Spesifikasyona uygun</span>':a.genel===false?'<span class="etiket-degil">Spesifikasyon dışı</span>':''}<button class="metin-dugme" data-analizac="${a.id}">${esc(a.analizNo||'Analizi')} aç</button></div>`; }
+  h+=`</div><dl class="ayrinti kd-bilgi">${satirD('Ölçüm tarihi',esc(r.zaman||tarihMetni(r.ts)))}${satirD('Yöntem',esc(r.yontem))}${r.V!==''&&r.V!=null?satirD('Su hacmi',`${fmt(r.V,1)} L`):''}${r.P?satirD('Basınç',esc(r.P)):''}${r.T!==''&&r.T!=null&&!isNaN(r.T)?satirD('Sıcaklık',`${fmt(r.T,1)} °C`):''}${r.not?satirD('Not',esc(r.not)):''}</dl>`;
+  if(!link){
+    if(pl.parts){ h+=`<div class="tablo-kap"><table><thead><tr><th class="sol">Gaz</th><th>Mol %</th><th>kg</th><th>m³</th></tr></thead><tbody>${pl.parts.map(p=>`<tr><td class="sol">${nokta(p.key)}${GAZ[p.key].ad}</td><td>${fmt(p.x*100,3)}</td><td>${fmt(p.kg,3)}</td><td>${fmt(p.m3,3)}</td></tr>`).join('')}</tbody></table></div>`; }
+    h+=`<p class="yan">${r.tupNo?`Bu dolum için GC analizi bulunamadı. GC analizinde numune ya da parti tüpü seri no olarak <b>${esc(r.tupNo)}</b> girildiğinde analiz sonucu burada görünür.`:'Tüp no girilmediği için bu kayıt bir GC analiziyle eşleştirilemez.'}</p></div>`;
+    return h;
+  }
+  const a=link.analiz, ic=analizeGoreIcerik(r,a);
+  const plan=new Map((pl.parts||[]).map(p=>[p.key,p])); const olc=new Map((ic.parts||[]).map(p=>[p.key,p]));
+  const anahtar=[...new Set([...(ic.parts||[]).map(p=>p.key),...(pl.parts||[]).map(p=>p.key)])];
+  const isaret=v=>(v>=0?'+':'−')+fmt(Math.abs(v),3);
+  h+=`<p class="kd-ozet">${esc(a.analizNo||'Analiz')} sonucuna göre (${esc(a.zaman)}) bu tüpe dolan gaz aşağıdadır. Planlanan değerler dolum kaydından gelir.</p>`;
+  h+=Gorsel.bilesim((ic.parts||[]).map(p=>({key:p.key,x:p.x})),RENKLER,ADLAR);
+  h+=`<div class="tablo-kap"><table><thead><tr><th class="sol">Gaz</th><th>Planlanan mol %</th><th>Analiz mol %</th><th>Fark</th><th>Planlanan kg</th><th>Analize göre kg</th><th>Fark kg</th><th>Analize göre m³</th></tr></thead><tbody>`;
+  let tPkg=0,tAkg=0,tAm3=0,tPm3=0;
+  for(const k of anahtar){
+    const p=plan.get(k), q=olc.get(k);
+    if(p){ tPkg+=p.kg||0; tPm3+=p.m3||0; } if(q){ tAkg+=q.kg; tAm3+=q.m3; }
+    h+=`<tr><td class="sol">${nokta(k)}${GAZ[k].ad}</td><td>${p?fmt(p.x*100,3):'—'}</td><td>${q?derisimMetni(q.x*100):'0'}</td><td>${isaret((q?q.x:0)*100-(p?p.x:0)*100)}</td><td>${p&&p.kg!=null?fmt(p.kg,3):'—'}</td><td>${q?fmt(q.kg,3):'0,000'}</td><td>${p&&p.kg!=null?isaret((q?q.kg:0)-p.kg):''}</td><td>${q?fmt(q.m3,3):'0,000'}</td></tr>`;
+  }
+  h+=`</tbody><tfoot><tr><td class="sol">Toplam</td><td></td><td></td><td></td><td>${pl.parts?fmt(tPkg,3):'—'}</td><td>${fmt(tAkg,3)}</td><td>${pl.parts?isaret(tAkg-tPkg):''}</td><td>${fmt(tAm3,3)}</td></tr></tfoot></table></div>`;
+  const notlar=[];
+  notlar.push(ic.temel==='basinc'?`Analize göre miktarlar, kayıttaki su hacmi, basınç ve sıcaklık ile analiz bileşiminden gerçek gaz denklemiyle yeniden hesaplandı${r.kalan?'; tüpte önceden kalan gaz düşüldü':''}.`:ic.temel==='kutle'?'Tartımla dolumda toplam kütle ölçüldüğü için aynen korundu ve analiz bileşimine göre bileşenlere dağıtıldı.':'Bu kayıt için analize göre miktar hesaplanamadı.');
+  notlar.push(`m³ değerleri ${ic.ref.ad} referans şartındadır.`);
+  if(link.adet>1) notlar.push(`Bu dolumdan sonra ${link.adet} analiz yapılmış; en son yapılan gösteriliyor.`);
+  if(olcumZamani(a)<olcumZamani(r)) notlar.push('Analiz tarihi dolum kaydından biraz önce görünüyor; tarihleri kontrol edin.');
+  h+=`<p class="yan">${notlar.join(' ')}</p></div>`;
+  return h;
+}
+
 // ---------- Kayıt sayfası ----------
 const DONEM={tum:'Tümü',bugun:'Bugün',hafta:'Son 7 gün',ay:'Bu ay'};
 function filtreliKayitlar(){
@@ -1909,20 +2017,30 @@ function cizKayitGovde(){
   liste.forEach(r=>{ const k=r.gaz+'|'+r.ref; oz[k]=oz[k]||{gaz:r.gaz,ref:r.ref,n:0,m3:0,kg:0}; oz[k].n++; oz[k].m3+=r.m3; oz[k].kg+=r.kg; m3+=r.m3; kg+=r.kg; });
   let h=`<div class="ozet-satir"><span><b>${liste.length}</b> dolum</span>${S.kayit.length!==liste.length?`<span class="yan">toplam ${S.kayit.length} kayıttan</span>`:''}</div>`;
   if(!liste.length){ el.innerHTML=h+`<div class="bos">Bu filtreye uyan kayıt yok.</div>`; return; }
-  h+=`<div class="tablo-kap"><table class="kayit-tablo"><thead><tr><th class="sol">Ölçüm tarihi</th><th class="sol">Tüp no</th><th class="sol">Müşteri</th><th class="sol">Gaz</th><th class="sol">Yöntem</th><th>Su hacmi L</th><th>Basınç</th><th>Sıcaklık °C</th><th>m³</th><th>kg</th><th class="sol">Not</th><th></th></tr></thead><tbody>`;
+  h+=`<div class="tablo-kap"><table class="kayit-tablo"><thead><tr><th class="sol">Ölçüm tarihi</th><th class="sol">Tüp no</th><th class="sol">Müşteri</th><th class="sol">Gaz</th><th class="sol">Yöntem</th><th>Su hacmi L</th><th>Basınç</th><th>Sıcaklık °C</th><th>m³</th><th>kg</th><th class="sol">GC analizi</th><th class="sol">Not</th><th></th></tr></thead><tbody>`;
+  const aIdx=analizIndeksi(), dIdx=dolumIndeksi();
   for(const r of liste){
-    h+=`<tr><td class="sol">${esc(r.zaman||tarihMetni(r.ts))}</td><td class="sol">${esc(r.tupNo||'')}</td><td class="sol">${esc(r.musteri||'')}</td><td class="sol">${esc(r.gaz)}${r.bilesen?`<div class="yan">${esc(r.bilesen)}</div>`:''}</td><td class="sol">${esc(r.yontem)}</td><td>${r.V===''||r.V==null?'':fmt(r.V,1)}</td><td>${esc(r.P||'')}</td><td>${r.T===''||r.T==null||isNaN(r.T)?'':fmt(r.T,1)}</td><td>${fmt(r.m3,3)}</td><td>${fmt(r.kg,3)}</td><td class="sol not-hucre">${esc(r.not||'')}</td><td><button class="sil" data-sil="${esc(r.id)}" aria-label="Kaydı sil">Sil</button></td></tr>`;
+    const link=kayitAnalizi(r,aIdx,dIdx), acik=S.acikKayit===r.id;
+    h+=`<tr${acik?' class="secili"':''}><td class="sol">${esc(r.zaman||tarihMetni(r.ts))}</td><td class="sol">${esc(r.tupNo||'')}</td><td class="sol">${esc(r.musteri||'')}</td><td class="sol">${esc(r.gaz)}${r.bilesen?`<div class="yan">${esc(r.bilesen)}</div>`:''}</td><td class="sol">${esc(r.yontem)}</td><td>${r.V===''||r.V==null?'':fmt(r.V,1)}</td><td>${esc(r.P||'')}</td><td>${r.T===''||r.T==null||isNaN(r.T)?'':fmt(r.T,1)}</td><td>${fmt(r.m3,3)}</td><td>${fmt(r.kg,3)}</td><td class="sol">${link?`<button class="metin-dugme" data-kayitdetay="${esc(r.id)}">${esc(link.analiz.analizNo||'Analiz')}</button> ${link.analiz.genel===true?'<span class="etiket-uygun">Uygun</span>':link.analiz.genel===false?'<span class="etiket-degil">Uygun değil</span>':''}`:'<span class="yan">—</span>'}</td><td class="sol not-hucre">${esc(r.not||'')}</td><td class="islem-hucre"><button class="metin-dugme" data-kayitdetay="${esc(r.id)}" aria-expanded="${acik}">${acik?'Kapat':'Ayrıntı'}</button> <button class="sil" data-sil="${esc(r.id)}" aria-label="Kaydı sil">Sil</button></td></tr>`;
+    if(acik) h+=`<tr class="detay-satir"><td colspan="13">${kayitDetayHtml(r,link)}</td></tr>`;
   }
   h+=`</tbody></table></div>`;
   h+=`<h2>Gaz bazında toplam</h2><div class="tablo-kap"><table><thead><tr><th class="sol">Gaz</th><th>Tüp</th><th>m³</th><th>kg</th><th class="sol">m³ referansı</th></tr></thead><tbody>${Object.values(oz).map(o=>`<tr><td class="sol">${esc(o.gaz)}</td><td>${o.n}</td><td>${fmt(o.m3,3)}</td><td>${fmt(o.kg,3)}</td><td class="sol">${esc(o.ref)}</td></tr>`).join('')}</tbody></table></div>`;
   h+=`<div class="tehlikeli"><button class="metin-dugme kirmizi" id="temizle">${liste.length===S.kayit.length?'Tüm kayıtları sil':`Filtredeki ${liste.length} kaydı sil`}</button></div>`;
   el.innerHTML=h;
+  detayGenisligi();
 }
 function csvMetni(ayr,liste){
-  const q=v=>{ const s=String(v??''); return /[;"\n\t]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
+  const q=v=>{ const t=String(v??''); return /[;"\n\t]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t; };
   const sayi=(v,d)=>v===''||v==null||isNaN(v)?'':Number(v).toFixed(d).replace('.',',');
-  const bas=['Ölçüm tarihi','Tüp no','Müşteri','Gaz','Yöntem','Su hacmi (L)','Basınç','Sıcaklık (°C)','m³','kg','Bileşenler','m³ referansı','Not'];
-  return [bas.join(ayr)].concat(liste.map(r=>[r.zaman||tarihMetni(r.ts),r.tupNo||'',r.musteri||'',r.gaz,r.yontem,sayi(r.V,1),r.P||'',sayi(r.T,1),sayi(r.m3,3),sayi(r.kg,3),r.bilesen||'',r.ref,r.not||''].map(q).join(ayr))).join('\r\n');
+  const aIdx=analizIndeksi(), dIdx=dolumIndeksi();
+  const bas=['Ölçüm tarihi','Tüp no','Müşteri','Gaz','Yöntem','Su hacmi (L)','Basınç','Sıcaklık (°C)','m³','kg','Bileşenler','m³ referansı','Not','GC analiz no','GC analiz tarihi','GC sonucu','Analize göre m³','Analize göre kg','Analize göre bileşenler'];
+  return [bas.join(ayr)].concat(liste.map(r=>{
+    const link=kayitAnalizi(r,aIdx,dIdx); let ek=['','','','','',''];
+    if(link){ const a=link.analiz, ic=analizeGoreIcerik(r,a); const p=ic.parts||[];
+      ek=[a.analizNo||'',a.zaman||'',a.genel===true?'Uygun':a.genel===false?'Uygun değil':'',p.length?sayi(p.reduce((t,x)=>t+x.m3,0),3):'',p.length?sayi(p.reduce((t,x)=>t+x.kg,0),3):'',p.map(x=>`${GAZ[x.key].f} %${fmt(x.x*100,3)} ${fmt(x.kg,3)} kg / ${fmt(x.m3,3)} m³`).join('; ')]; }
+    return [r.zaman||tarihMetni(r.ts),r.tupNo||'',r.musteri||'',r.gaz,r.yontem,sayi(r.V,1),r.P||'',sayi(r.T,1),sayi(r.m3,3),sayi(r.kg,3),r.bilesen||'',r.ref,r.not||'',...ek].map(q).join(ayr);
+  })).join('\r\n');
 }
 function indir(ad,icerik,tur){
   const blob=new Blob([icerik],{type:tur});
@@ -1992,7 +2110,7 @@ function cizGcSayfasi(){
   if(g.gorunum==='yeni') h+=gcFormHtml();
   else h+=`<div class="filtre"><div class="giris arama"><input id="gc-ara" data-gcara="1" placeholder="Müşteri, analiz no, parti ya da tüp seri no ara" value="${esc(g.ara)}" autocomplete="off" aria-label="Analizlerde ara"></div><button class="dugme ikincil" id="gc-csv">CSV indir</button></div><div id="gc-liste"></div><div id="gc-detay"></div>`;
   kok.innerHTML=h+`</section>`;
-  if(g.gorunum==='yeni') gcHesapla(); else { cizGcListe(); if(g.acik) cizGcDetay(g.acik,false); }
+  if(g.gorunum==='yeni'){ gcHesapla(); if(g.form.kayitSecAcik) cizGcKayitListe(); } else { cizGcListe(); if(g.acik) cizGcDetay(g.acik,false); }
 }
 
 function gcFormHtml(){
@@ -2046,7 +2164,8 @@ function gcFormHtml(){
       <td><button class="ikon" data-gctupkaldir="${i}" ${f.tupler.length<=1?'disabled':''} aria-label="Tüpü kaldır"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" stroke-width="1.6"/></svg></button></td></tr>`;
   });
   h+=`</tbody><tfoot><tr><td class="sol" colspan="5" id="gc-tup-ozet">Toplam</td><td id="gc-tm3-top"></td><td id="gc-tkg-top"></td><td></td></tr></tfoot></table></div>
-    <div class="gc-tup-dugmeler"><button class="metin-dugme" data-gctupekle="1">Tüp ekle</button><button class="metin-dugme" data-gcnumunetup="1">Numune tüpünü ekle</button><button class="metin-dugme" data-gctoplu="1">${f.topluAcik?'Toplu eklemeyi kapat':'Seri numaralarını toplu ekle'}</button></div>`;
+    <div class="gc-tup-dugmeler"><button class="metin-dugme" data-gctupekle="1">Tüp ekle</button><button class="metin-dugme" data-gcnumunetup="1">Numune tüpünü ekle</button><button class="metin-dugme" data-gckayitsec="1">${f.kayitSecAcik?'Dolum kayıtları listesini kapat':'Dolum kayıtlarından ekle'}</button><button class="metin-dugme" data-gctoplu="1">${f.topluAcik?'Toplu eklemeyi kapat':'Seri numaralarını toplu ekle'}</button></div>`;
+  if(f.kayitSecAcik) h+=`<div class="alt-kutu gc-kayit-sec"><div class="giris arama"><input id="gc-kayit-ara" data-gckayitara="1" value="${esc(f.kayitAra||'')}" placeholder="Tüp no ya da müşteri ara" autocomplete="off" aria-label="Dolum kayıtlarında ara"></div><div id="gc-kayit-liste"></div><div class="kaydet-alt"><button class="dugme ikincil" data-gckayitekle="1">Seçilenleri partiye ekle</button></div></div>`;
   if(f.topluAcik) h+=`<div class="alt-kutu gc-toplu"><label for="gc-toplu-metin">Her satıra bir seri no yazın ya da Excel'den yapıştırın. Su hacmi, basınç ve sıcaklık son satırdan alınır.</label><textarea id="gc-toplu-metin" data-gctoplumetin="1" rows="4">${esc(f.toplu)}</textarea><button class="dugme ikincil" data-gctopluekle="1">Listeye ekle</button></div>`;
 
   h+=`<div class="kaydet gc-kaydet"><div class="kaydet-alt"><button class="dugme" id="gc-kaydet">${f.duzenle?'Kaydı güncelle':'Analizi kaydet'}</button>${f.duzenle?'<button class="dugme ikincil" id="gc-vazgec">Düzenlemeden çık</button>':''}<button class="metin-dugme" id="gc-temizle">Formu temizle</button></div></div>`;
@@ -2058,6 +2177,19 @@ function gcFormHtml(){
   return h;
 }
 
+function kayittanTupSatiri(r){
+  const Pa=kayitBasinci(r);
+  const P=Pa?String(+((S.olcum==='g'?Pa/1e5-S.patm:Pa/1e5)).toFixed(1)).replace('.',','):'';
+  return {seri:r.tupNo,V:r.V===''||r.V==null?'':String(r.V).replace('.',','),P,T:r.T===''||r.T==null||isNaN(r.T)?'':String(r.T).replace('.',','),oto:false};
+}
+function cizGcKayitListe(){
+  const el=$('#gc-kayit-liste'); if(!el) return;
+  const f=S.gc.form, q=(f.kayitAra||'').trim().toLocaleLowerCase('tr-TR');
+  const mevcut=new Set(f.tupler.map(t=>tupAnahtari(t.seri)).filter(Boolean));
+  const l=S.kayit.filter(r=>r.tupNo && !mevcut.has(tupAnahtari(r.tupNo)) && (!q||[r.tupNo,r.musteri,r.gaz].join(' ').toLocaleLowerCase('tr-TR').includes(q))).sort((a,b)=>olcumZamani(b)-olcumZamani(a)).slice(0,60);
+  if(!l.length){ el.innerHTML=`<p class="yan">${S.kayit.some(r=>r.tupNo)?'Uygun dolum kaydı yok; partide olmayan ve tüp numarası girilmiş kayıtlar listelenir.':'Tüp numarası girilmiş dolum kaydı yok.'}</p>`; return; }
+  el.innerHTML=`<div class="tablo-kap"><table class="gc-kayit-tablo"><thead><tr><th></th><th class="sol">Ölçüm tarihi</th><th class="sol">Tüp no</th><th class="sol">Müşteri</th><th class="sol">Gaz</th><th>Su hacmi L</th><th>Basınç</th><th>Sıcaklık °C</th></tr></thead><tbody>${l.map(r=>`<tr><td><input type="checkbox" data-gckayit="${esc(r.id)}" aria-label="${esc(r.tupNo)} seç"></td><td class="sol">${esc(r.zaman||tarihMetni(r.ts))}</td><td class="sol">${esc(r.tupNo)}</td><td class="sol">${esc(r.musteri||'')}</td><td class="sol">${esc(r.gaz)}</td><td>${r.V===''||r.V==null?'':fmt(r.V,1)}</td><td>${esc(r.P||'')}</td><td>${r.T===''||r.T==null||isNaN(r.T)?'':fmt(r.T,1)}</td></tr>`).join('')}</tbody></table></div>`;
+}
 function gcGirdileriniOku(){
   const f=S.gc.form;
   const sart=f.sartOn?{rP:num(f.rP)*1e5,rT:num(f.rT)+273.15,sP:num(f.sP)*1e5,sT:num(f.sT)+273.15}:null;
@@ -2134,6 +2266,7 @@ function cizGcListe(){
     return `<tr${S.gc.acik===a.id?' class="secili"':''}><td class="sol">${esc(a.zaman)}</td><td class="sol">${esc(a.analizNo)}</td><td class="sol">${esc(a.musteri)}</td><td class="sol">${esc(a.seriNo)}</td><td class="sol">${esc(a.partiNo)}${eslesenTup.length?`<div class="yan">tüp: ${esc(eslesenTup.join(', '))}</div>`:''}</td><td class="sol not-hucre">${esc(bilesimMetni(a.sonuc))}</td><td>${a.tupler.length}</td><td class="sol">${DURUM_ETIKET(a.genel)}</td><td class="islem-hucre"><button class="metin-dugme" data-gcac="${a.id}">Aç</button> <button class="sil" data-gcsil="${a.id}">Sil</button></td></tr>`;}).join('')}</tbody></table></div>`;
 }
 function gcDetayHtml(a){
+  const dIdxR=dolumIndeksi();
   const hT=[...Array(a.tekrar).keys()];
   let h=`<div class="gc-detay-ust"><div><div class="yan">GC analiz raporu</div><h2 class="sayfa-baslik">${esc(a.analizNo||'Analiz no girilmemiş')}</h2></div>${a.genel!==null?`<div class="gc-karar ${a.genel?'uygun':'degil'}">${a.genel?'Spesifikasyona uygun':'Spesifikasyon dışı'}</div>`:''}</div>`;
   h+=`<dl class="ayrinti gc-bilgi">${satirD('Müşteri',esc(a.musteri)||'—')}${satirD('Analiz tarihi',esc(a.zaman))}${satirD('Numune tüp seri no',esc(a.seriNo)||'—')}${satirD('Parti no',esc(a.partiNo)||'—')}${satirD('Enjeksiyon tekrarı',a.tekrar)}${satirD('Enjeksiyon şartı düzeltmesi',a.sartOn?`referans ${esc(a.rP)} bar a, ${esc(a.rT)} °C; numune ${esc(a.sP)} bar a, ${esc(a.sT)} °C`:'yok')}</dl>`;
@@ -2144,7 +2277,7 @@ function gcDetayHtml(a){
   h+=`</tbody></table></div><p class="yan">${a.normalize?`Ham toplam %${fmt(a.toplamHam,3)}, sonuçlar 100'e normalize edildi.`:'Denge bileşeni 100\'den kalan olarak hesaplandı.'}</p>`;
   if(a.tupler.length){
     const tm3=a.tupler.reduce((s,t)=>s+(t.m3||0),0), tkg=a.tupler.reduce((s,t)=>s+(t.kg||0),0);
-    h+=`<h2>Parti tüpleri</h2><div class="tablo-kap"><table><thead><tr><th class="sol">#</th><th class="sol">Seri no</th><th>Su hacmi L</th><th>Basınç ${esc(a.birim)}</th><th>Sıcaklık °C</th><th>m³</th><th>kg</th></tr></thead><tbody>${a.tupler.map((t,i)=>`<tr><td class="sol yan">${i+1}</td><td class="sol">${esc(t.seri)}</td><td>${esc(t.V)}</td><td>${esc(t.P)}</td><td>${esc(t.T)}</td><td>${t.m3!=null?fmt(t.m3,3):''}</td><td>${t.kg!=null?fmt(t.kg,3):''}</td></tr>`).join('')}</tbody><tfoot><tr><td class="sol" colspan="5">Toplam ${a.tupler.length} tüp</td><td>${fmt(tm3,3)}</td><td>${fmt(tkg,3)}</td></tr></tfoot></table></div><p class="yan">m³ değerleri ${esc(a.ref)} referans şartındadır.</p>`;
+    h+=`<h2>Parti tüpleri</h2><div class="tablo-kap"><table><thead><tr><th class="sol">#</th><th class="sol">Seri no</th><th>Su hacmi L</th><th>Basınç ${esc(a.birim)}</th><th>Sıcaklık °C</th><th>m³</th><th>kg</th><th class="sol">Dolum kaydı</th></tr></thead><tbody>${a.tupler.map((t,i)=>{ const dk=analizinDolumu(a,t.seri,dIdxR); return `<tr><td class="sol yan">${i+1}</td><td class="sol">${esc(t.seri)}</td><td>${esc(t.V)}</td><td>${esc(t.P)}</td><td>${esc(t.T)}</td><td>${t.m3!=null?fmt(t.m3,3):''}</td><td>${t.kg!=null?fmt(t.kg,3):''}</td><td class="sol">${dk?`${esc(dk.zaman||tarihMetni(dk.ts))} <span class="yan">${esc(dk.yontem)}</span>`:'<span class="yan">bulunamadı</span>'}</td></tr>`; }).join('')}</tbody><tfoot><tr><td class="sol" colspan="5">Toplam ${a.tupler.length} tüp</td><td>${fmt(tm3,3)}</td><td>${fmt(tkg,3)}</td><td></td></tr></tfoot></table></div><p class="yan">m³ değerleri ${esc(a.ref)} referans şartındadır. Dolum kaydı sütunu, Kayıtlar sayfasında aynı tüp numarasıyla analizden önce yapılmış son dolumu gösterir.</p>`;
   }
   return h;
 }
@@ -2185,13 +2318,14 @@ kok.addEventListener('input',e=>{
   if(d.gcf){ f[d.gcf]=t.value; if(['sP','sT','rP','rT'].includes(d.gcf)) gcHesapla(); return; }
   if(d.gcara){ S.gc.ara=t.value; cizGcListe(); return; }
   if(d.gctoplumetin){ f.toplu=t.value; return; }
+  if(d.gckayitara){ f.kayitAra=t.value; cizGcKayitListe(); return; }
   if(d.gcsatir!==undefined && t.type!=='checkbox' && t.tagName!=='SELECT'){
     const r=f.satir[+d.gcsatir];
     if(d.gcalan==='alan') r.alan[+d.gcenj]=t.value; else r[d.gcalan]=t.value;
     if(d.gcalan==='refAlan'||d.gcalan==='refDer'){ S.gcRef[r.k]={alan:r.refAlan,der:r.refDer,tarih:Date.now()}; saklaGcRef(); }
     gcHesapla(); return;
   }
-  if(d.gctup!==undefined){ f.tupler[+d.gctup][d.gctupalan]=t.value; if(d.gctupalan!=='seri') gcHesapla(); return; }
+  if(d.gctup!==undefined){ f.tupler[+d.gctup][d.gctupalan]=t.value; if(d.gctupalan!=='seri') f.tupler[+d.gctup].oto=false; if(d.gctupalan!=='seri') gcHesapla(); return; }
 });
 kok.addEventListener('change',e=>{
   const t=e.target, d=t.dataset; if(S.sekme!=='gc') return;
@@ -2199,6 +2333,13 @@ kok.addEventListener('change',e=>{
   if(d.gctekrar){ const n=+t.value; f.tekrar=n; f.satir.forEach(r=>{ r.alan=Array.from({length:n},(_,j)=>r.alan[j]||''); }); cizGcSayfasi(); return; }
   if(d.gcsart){ f.sartOn=t.checked; cizGcSayfasi(); return; }
   if(d.gcsatir!==undefined && d.gcalan==='k'){ const r=f.satir[+d.gcsatir]; r.k=t.value; const ref=S.gcRef[r.k]; r.refAlan=ref?ref.alan:''; r.refDer=ref?ref.der:'100'; cizGcSayfasi(); return; }
+  if(d.gctup!==undefined && d.gctupalan==='seri'){
+    const row=f.tupler[+d.gctup], r=sonDolumKaydi(t.value);
+    if(tupAnahtari(t.value) && f.tupler.some((x,j)=>j!==+d.gctup && tupAnahtari(x.seri)===tupAnahtari(t.value))){ bildir(`${t.value.trim()} bu partide zaten var.`); return; }
+    if(r && (row.oto || !String(row.P).trim())){ Object.assign(row,kayittanTupSatiri(r),{seri:t.value.trim()}); cizGcSayfasi(); bildir(`${r.tupNo} için su hacmi, basınç ve sıcaklık ${r.zaman||tarihMetni(r.ts)} tarihli dolum kaydından alındı.`); }
+    return;
+  }
+  if(d.gcf==='seriNo'){ const r=sonDolumKaydi(t.value); if(r&&r.musteri&&!f.musteri.trim()){ f.musteri=r.musteri; const m=document.getElementById('gc-musteri'); if(m) m.value=r.musteri; bildir(`Müşteri, ${r.tupNo} dolum kaydından alındı.`); } return; }
   if(d.gcsatir!==undefined && d.gcalan==='denge'){ f.satir.forEach((r,i)=>{ r.denge = i===+d.gcsatir ? t.checked : false; }); cizGcSayfasi(); return; }
 });
 kok.addEventListener('click',async e=>{
@@ -2212,7 +2353,17 @@ kok.addEventListener('click',async e=>{
   }
   if(d.gcekle){ const bos=GC_GAZ.find(k=>!f.satir.some(r=>r.k===k)); f.satir.push(gcSatir(bos||'N2','','',false,f.tekrar)); cizGcSayfasi(); return; }
   if(d.gckaldir!==undefined){ f.satir.splice(+d.gckaldir,1); cizGcSayfasi(); return; }
-  if(d.gctupekle){ const s=f.tupler[f.tupler.length-1]||{V:'50',P:'',T:'15'}; f.tupler.push({seri:'',V:s.V,P:s.P,T:s.T}); cizGcSayfasi(); const son=document.querySelector(`[data-gctup="${f.tupler.length-1}"][data-gctupalan="seri"]`); if(son) son.focus(); return; }
+  if(d.gctupekle){ const s=f.tupler[f.tupler.length-1]||{V:'50',P:'',T:'15'}; f.tupler.push({seri:'',V:s.V,P:s.P,T:s.T,oto:true}); cizGcSayfasi(); const son=document.querySelector(`[data-gctup="${f.tupler.length-1}"][data-gctupalan="seri"]`); if(son) son.focus(); return; }
+  if(d.gckayitsec){ f.kayitSecAcik=!f.kayitSecAcik; cizGcSayfasi(); if(f.kayitSecAcik) document.getElementById('gc-kayit-ara')?.focus(); return; }
+  if(d.gckayitekle){
+    const ids=[...document.querySelectorAll('[data-gckayit]:checked')].map(x=>x.dataset.gckayit);
+    if(!ids.length) return bildir('Önce eklenecek dolum kayıtlarını işaretleyin.');
+    f.tupler=f.tupler.filter(x=>String(x.seri).trim()||String(x.P).trim());
+    for(const id of ids){ const r=S.kayit.find(x=>x.id===id); if(r) f.tupler.push(kayittanTupSatiri(r)); }
+    if(!f.tupler.length) f.tupler.push({seri:'',V:'50',P:'',T:'15'});
+    if(!f.musteri.trim()){ const r=S.kayit.find(x=>x.id===ids[0]); if(r&&r.musteri) f.musteri=r.musteri; }
+    f.kayitSecAcik=false; cizGcSayfasi(); bildir(`${ids.length} tüp dolum kayıtlarından partiye eklendi.`); return;
+  }
   if(d.gctupkaldir!==undefined){ f.tupler.splice(+d.gctupkaldir,1); cizGcSayfasi(); return; }
   if(d.gcnumunetup){
     if(!f.seriNo.trim()) return bildir('Önce numune tüp seri numarasını girin.');
@@ -2228,9 +2379,9 @@ kok.addEventListener('click',async e=>{
     const varOlan=new Set(f.tupler.map(x=>x.seri.trim()).filter(Boolean));
     const s=f.tupler[f.tupler.length-1]||{V:'50',P:'',T:'15'};
     f.tupler=f.tupler.filter(x=>x.seri.trim()||x.P);
-    let eklenen=0; for(const sr of seriler){ if(varOlan.has(sr)) continue; varOlan.add(sr); f.tupler.push({seri:sr,V:s.V,P:s.P,T:s.T}); eklenen++; }
+    let eklenen=0; for(const sr of seriler){ if(varOlan.has(sr)) continue; varOlan.add(sr); const dk=sonDolumKaydi(sr); f.tupler.push(dk?kayittanTupSatiri(dk):{seri:sr,V:s.V,P:s.P,T:s.T,oto:true}); if(dk) f.tupler[f.tupler.length-1].seri=sr; eklenen++; }
     if(!f.tupler.length) f.tupler.push({seri:'',V:s.V,P:s.P,T:s.T});
-    f.toplu=''; f.topluAcik=false; cizGcSayfasi(); bildir(`${eklenen} tüp eklendi${seriler.length!==eklenen?', tekrar edenler atlandı':''}.`); return;
+    f.toplu=''; f.topluAcik=false; cizGcSayfasi(); const kayitli=seriler.filter(x=>sonDolumKaydi(x)).length; bildir(`${eklenen} tüp eklendi${seriler.length!==eklenen?', tekrar edenler atlandı':''}${kayitli?`; ${kayitli} tanesinin değerleri dolum kayıtlarından alındı`:''}.`); return;
   }
   if(t.id==='gc-kaydet'){
     gcHesapla();
@@ -2360,13 +2511,15 @@ kok.addEventListener('click',async e=>{
     if(!sonHesap) return;
     const tarih=kayitTarihi('form'); if(tarih==null) return;
     const ts=Date.now();
-    S.kayit.push({...sonHesap,id:kimlik(),ts,tarih,zaman:tarihMetni(tarih),ref:REF[S.ref].ad,tupNo:S.form.tup.trim(),musteri:S.form.musteri.trim(),not:S.form.not.trim()});
+    S.kayit.push({...sonHesap,refKey:S.ref,olcum:S.olcum,patm:S.patm,id:kimlik(),ts,tarih,zaman:tarihMetni(tarih),ref:REF[S.ref].ad,tupNo:S.form.tup.trim(),musteri:S.form.musteri.trim(),not:S.form.not.trim()});
     S.form.tup=''; S.form.not='';
     const a=document.getElementById('form.tup'), b=document.getElementById('form.not'); if(a) a.value=''; if(b) b.value='';
     await saklaKayit(); sayaclar(); bildir(`Kaydedildi (${tarihMetni(tarih)}). Toplam ${S.kayit.length} kayıt.`);
     if(a) a.focus();
     return;
   }
+  if(d.kayitdetay){ S.acikKayit=S.acikKayit===d.kayitdetay?null:d.kayitdetay; cizKayitGovde(); return; }
+  if(d.analizac){ S.sekme='gc'; S.gc.gorunum='kayitlar'; S.gc.ara=''; S.gc.acik=d.analizac; ciz(); cizGcDetay(d.analizac); return; }
   if(d.sil!==undefined){
     const i=S.kayit.findIndex(r=>r.id===d.sil); if(i<0) return;
     const [silinen]=S.kayit.splice(i,1); S.silinenler[silinen.id]=Date.now(); await saklaKayit(); sayaclar(); cizKayitGovde();
@@ -2381,9 +2534,9 @@ kok.addEventListener('click',async e=>{
     bildir(`${liste.length} kayıt silindi.`,async()=>{ const g=Date.now(); yedek.forEach(r=>{ if(ids.has(r.id)) r.guncel=g; }); S.kayit=yedek; await saklaKayit(); sayaclar(); cizKayitGovde(); });
     return;
   }
-  if(t.id==='csv'){ const l=filtreliKayitlar(); if(!l.length) return bildir('İndirilecek kayıt yok.'); indir('dolum-kayitlari-'+new Date().toISOString().slice(0,10)+'.csv','\ufeff'+csvMetni(';',l),'text/csv;charset=utf-8'); bildir('CSV dosyası indirildi.'); return; }
+  if(t.id==='csv'){ const l=filtreliKayitlar().slice().sort((a,b)=>olcumZamani(b)-olcumZamani(a)); if(!l.length) return bildir('İndirilecek kayıt yok.'); indir('dolum-kayitlari-'+new Date().toISOString().slice(0,10)+'.csv','\ufeff'+csvMetni(';',l),'text/csv;charset=utf-8'); bildir('CSV dosyası indirildi.'); return; }
   if(t.id==='kopyala'){
-    const l=filtreliKayitlar(); if(!l.length) return bildir('Kopyalanacak kayıt yok.');
+    const l=filtreliKayitlar().slice().sort((a,b)=>olcumZamani(b)-olcumZamani(a)); if(!l.length) return bildir('Kopyalanacak kayıt yok.');
     try{ await navigator.clipboard.writeText(csvMetni('\t',l)); bildir('Tablo panoya kopyalandı; Excel\'e yapıştırabilirsiniz.'); }
     catch(_){ bildir('Pano erişimi engellendi. CSV indir seçeneğini kullanın.'); }
     return;
