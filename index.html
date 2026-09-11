@@ -734,6 +734,8 @@ const Calc = (function(G){
     // Pratik formül: bar g × litre / 1000
     const practical=(opt.Pg_bar*opt.V_L/1000);
     warn.push(...condensationWarnings(comps,P,T));
+    let ayrisma=null;
+    if(comps.length>1 && opt.ayrisma!==false){ ayrisma=ayrismaSiniri(comps,Math.max(P,opt.residual?opt.residual.P_abs:0)); const au=ayrismaUyarisi(ayrisma,T); if(au && !warn.some(w=>/ayrış/.test(w))) warn.push(au); }
     if(opt.tahminT && comps.length>1 && Math.abs(opt.tahminT-T)>0.5){ const w2=condensationWarnings(comps,mix.p(sol.rho,opt.tahminT),opt.tahminT); if(w2.length) warn.push(`Tahmin sıcaklığında (${fmt(opt.tahminT-273.15,1)} °C): `+w2[0]); }
     if(comps.some(c=>c.key==='NO')) warn.push('Azot monoksit için referans hal denklemi yok; karşılıklı haller yaklaşımı kullanıldı. Saf NO sonuçlarında belirsizlik yaklaşık ±%2, düşük derişimli karışımlarda ihmal edilebilir.');
     if(mix.missing && mix.missing.length) warn.push(`${mix.missing.join(', ')} çifti için ölçüme dayalı karışım parametresi yok; Lorentz–Berthelot varsayımı kullanıldı. Yüksek derişimde basınçla hesap %1–3 sapabilir, bu karışımı tartımla faturalandırmanız önerilir.`);
@@ -749,7 +751,7 @@ const Calc = (function(G){
         plan.push({key:c.key, addKg, cumKg, p:st.p, liquid:LIQ.includes(c.key), phase:st.phase});
       }
     }
-    return {Z, rho:sol.rho, rho_kgm3:sol.rho*mix.M, nTot, nNet, nRes, kg, m3, kgTot, m3Tot, parts, P15, Ptahmin:opt.tahminT?mix.p(sol.rho,opt.tahminT):null, target, practical, warn, info, plan, M:mix.M};
+    return {Z, rho:sol.rho, rho_kgm3:sol.rho*mix.M, nTot, nNet, nRes, kg, m3, kgTot, m3Tot, parts, P15, Ptahmin:opt.tahminT?mix.p(sol.rho,opt.tahminT):null, ayrisma, target, practical, warn, info, plan, M:mix.M};
   }
 
   // ---- Karışım: tartım ile ----
@@ -770,7 +772,8 @@ const Calc = (function(G){
     let Z=null;
     if(!st.phase){ const mix=mixOf(comps); Z=mix.Z(N/V,T); if(comps.length>1) warn.push(...condensationWarnings(comps,st.p,T)); }
     if(comps.length>1){ const mix=mixOf(comps); if(mix.missing.length) warn.push(`${mix.missing.join(', ')} çifti için ölçüme dayalı karışım parametresi yok. Kütle ve m³ sonuçları tartıma dayandığı için etkilenmez, yalnızca tahmini basınç %1–3 sapabilir.`); }
-    return {parts, kg, m3, N, p:st.p, Ptahmin:st15.p, tahminPhase:st15.phase, phase:st.phase, Z, warn, rho_kgm3:kg/V};
+    let ayrisma=null; if(comps.length>1){ ayrisma=ayrismaSiniri(comps,st.p); const au=ayrismaUyarisi(ayrisma,T); if(au && !warn.some(w=>/ayrış/.test(w))) warn.push(au); }
+    return {ayrisma, parts, kg, m3, N, p:st.p, Ptahmin:st15.p, tahminPhase:st15.phase, phase:st.phase, Z, warn, rho_kgm3:kg/V};
   }
 
   // ---- Sıvılaştırılmış / çözünmüş gaz: tartım ile ----
@@ -995,10 +998,42 @@ const Calc = (function(G){
         }
       }
     }
-    return {N, parts, kg:toplamKg, m3:parts.reduce((s,p)=>s+p.m3,0), pHedef, pDolum, plan, araKarisim, warn, comps};
+    let ayrisma=null; if(comps.length>1){ ayrisma=ayrismaSiniri(comps,Math.max(pHedef,pDolum)); const au=ayrismaUyarisi(ayrisma,Math.min(opt.hedefT,opt.dolumT)); if(au && !warn.some(w=>/ayrış/.test(w))) warn.push(au); }
+    return {ayrisma, N, parts, kg:toplamKg, m3:parts.reduce((s,p)=>s+p.m3,0), pHedef, pDolum, plan, araKarisim, warn, comps};
   }
 
-  return {tasarim, gcAnaliz, zSaf, byPressure, mixtureByWeight, liquefied, refDensity, vref, LIQ, AD, fmt, isochore, stateCurve, expectedAt, satTemp, checkCompressed, checkLiquefied, pressureOfState};
+  // ---- Tüp boşalırken tek faz sınırı: izin verilen basınçlar boyunca en yüksek çiy sıcaklığı ----
+  const ayrismaOnbellek={};
+  function ciyNoktasi(comps,P){
+    const S=Stability; let lo=190, hi=340;
+    if(S.unstable(comps,P,hi)) return hi;
+    if(!S.unstable(comps,P,lo)){ let b=null; for(let T=hi-10;T>lo;T-=10){ if(S.unstable(comps,P,T)){ b=T; break; } } if(b==null) return null; lo=b; }
+    for(let i=0;i<13;i++){ const m=(lo+hi)/2; if(S.unstable(comps,P,m)) lo=m; else hi=m; }
+    return lo;
+  }
+  function ayrismaEgrisi(comps){
+    const k=comps.map(c=>c.key+':'+c.x.toFixed(5)).sort().join('|');
+    if(ayrismaOnbellek[k]) return ayrismaOnbellek[k];
+    const anahtarlar=Object.keys(ayrismaOnbellek); if(anahtarlar.length>120) delete ayrismaOnbellek[anahtarlar[0]];
+    const egri=[]; for(let P=3e5;P<=320e5;P*=1.22){ egri.push({P,T:ciyNoktasi(comps,P)}); }
+    return (ayrismaOnbellek[k]=egri);
+  }
+  function ayrismaSiniri(comps,Pmax){
+    if(comps.length<2 || !comps.some(c=>LIQ.includes(c.key)) || typeof Stability==='undefined') return null;
+    try{
+      let en=null;
+      for(const n of ayrismaEgrisi(comps)){ if(n.P>Pmax*1.02) break; if(n.T!=null&&(!en||n.T>en.T)) en={T:n.T,P:n.P}; }
+      if(en){ for(const f of [0.9,1.1]){ const P=en.P*f; if(P>Pmax||P<2e5) continue; const T=ciyNoktasi(comps,P); if(T!=null&&T>en.T) en={T,P}; } }
+      return en;
+    }catch(_){ return null; }
+  }
+  function ayrismaUyarisi(ay,T){
+    if(!ay) return null;
+    if(ay.T < Math.min(T,283.15)-5) return null;
+    return `Tüp boşalırken basınç yaklaşık ${fmt(ay.P/1e5,0)} bar a'ya indiğinde ${fmt(ay.T-273.15,0)} °C ve altında karışımdan sıvı ayrışabilir. Tüp bu sıcaklığın altında depolanır ya da kullanılırsa önce oranı bozuk gaz çekilir. Karışımı bu sınırın en az 5 °C üstünde tutun ya da daha düşük oranda sıvılaşabilen bileşen kullanın.`;
+  }
+
+  return {ayrismaSiniri, tasarim, gcAnaliz, zSaf, byPressure, mixtureByWeight, liquefied, refDensity, vref, LIQ, AD, fmt, isochore, stateCurve, expectedAt, satTemp, checkCompressed, checkLiquefied, pressureOfState};
 })(GasEngine);
 if(typeof module!=='undefined') module.exports=Calc;
 
@@ -1387,7 +1422,7 @@ function yontem(){
     <li>Bu denklemlerin gaz bölgesindeki yoğunluk belirsizliği tipik olarak %0,02 ile %0,1 arasındadır. Pratikte asıl hata kaynağı ölçümdür: 200 bar'da 1 bar manometre hatası yaklaşık %0,5, 1 °C sıcaklık hatası yaklaşık %0,35 kütle hatası yaratır.</li>
     <li>Tüp su hacmi damgalı değerden birkaç yüzde farklı olabilir ve basınç altında tüp çok az genleşir; kesin sonuç gereken durumlarda tartım en güvenilir yöntemdir.</li>
     <li>Azot monoksit için referans denklem bulunmadığından karşılıklı haller yaklaşımı kullanılır (saf NO'da yaklaşık ±%2). Asetilenin referans yoğunluğu ikinci virial katsayısıyla hesaplanır.</li>
-    <li>Karışımlarda ayrışma uyarısı Peng–Robinson denklemiyle yapılan kararlılık testine dayanır ve yalnızca uyarı amaçlıdır.</li>
+    <li>Karışımlarda ayrışma uyarısı Peng–Robinson denklemiyle yapılan kararlılık testine dayanır ve yalnızca uyarı amaçlıdır. "Tek faz sınırı", tüp dolum basıncından boşalana kadar geçtiği tüm basınçlarda karışımın sıvı ayrıştırmaya başladığı en yüksek sıcaklıktır; tüp bu sıcaklığın üstünde depolanıp kullanıldığı sürece çekilen gazın oranı değişmez. CO₂–N₂ ve CO₂–Ar karışımlarında GERG-2008 faz zarfıyla birkaç derece içinde uyumludur.</li>
     <li>Manometre kontrolünde hedef basınç, sizin girdiğiniz hedef sıcaklığındaki (genellikle 15 °C) dolum basıncıdır. Program aynı gaz miktarının termometre sıcaklığında göstermesi gereken basıncı hesaplar ve okunan değeri kabul aralığıyla karşılaştırır. Termometre tüp yüzeyini ölçer; hızlı dolumda içerideki gaz daha sıcak olduğundan basınç bir süre yüksek görünür.</li>
     <li>Siparişten modunda denge gazı miktarı, karışımın hedef basınç ve sıcaklıkta tüpü tam dolduracağı toplam madde miktarı gerçek gaz denklemiyle çözülerek bulunur. Tartım belirsizliği terazi çözünürlüğünün eklenen kütleye oranıdır; ara karışım önerisi her tartımda en az 200 çözünürlük adımı hedefler.</li>
     <li>Standart m³ her bileşenin referans şarttaki gerçek gaz yoğunluğu ile hesaplanır; karışımda bileşen hacimleri toplanır.</li>
@@ -1427,6 +1462,7 @@ function kontrolBlok(o){
   return h;
 }
 
+function ayrismaMetni(ay){ return ay?`${fmt(ay.T-273.15,0)} °C <span class="yan">en riskli an: tüp ~${fmt(ay.P/1e5,0)} bar a</span>`:''; }
 function hesaplaTek(){
   const t=S.tek, g=t.gaz, R=ref();
   if(C.LIQ.includes(g)||g==='C2H2') return hesaplaSivi();
@@ -1491,6 +1527,7 @@ function basincliHesap(o){
   if(o.kalan) h+=satirD('Tüpteki toplam',`${fmt(r.m3Tot,3)} m³, ${fmt(r.kgTot,3)} kg`)+satirD('Önceden kalan',`${fmt(r.m3Tot-r.m3,3)} m³, ${fmt(r.kgTot-r.kg,3)} kg`);
   h+=satirD('Sıkıştırılabilirlik faktörü Z',fmt(r.Z,4));
   h+=satirD('Madde miktarı',`${fmt(r.nTot/1000,3)} kmol`);
+  if(r.ayrisma) h+=satirD('Tek faz sınırı (tüp boşalırken)',ayrismaMetni(r.ayrisma));
   if(!bek && tTK) h+=satirD(`${TT1} °C'de olacak basınç`,fP(r.Ptahmin));
   h+=satirD('Basınç × su hacmi pratiği',`${fmt(r.practical,3)} m³ <span class="yan">${pratikFark>=0?'+':'−'}%${fmt(Math.abs(pratikFark),1)}</span>`);
   h+=`</dl>`;
@@ -1644,6 +1681,7 @@ function hesaplaKar(){
     const satir=[[`${T1} °C'de beklenen`,fP(r.p)],['Kabul aralığı',`${fP(r.p-tolPa)} ile ${fP(r.p+tolPa)}`]];
     if(tTK&&r.Ptahmin!=null) satir.push([`${fmt(tT,1)} °C'de olacak basınç`,`${fP(r.Ptahmin)}${r.tahminPhase?` <span class="yan">${r.tahminPhase}</span>`:''}`]);
     if(r.Z) satir.push(['Sıkıştırılabilirlik faktörü Z',fmt(r.Z,4)]);
+    if(r.ayrisma) satir.push(['Tek faz sınırı (tüp boşalırken)',ayrismaMetni(r.ayrisma)]);
     h+=kontrolBlok({durum,baslik:M[0],metin:M[1],satirlar:satir,kadran:{okunan:oku!=null?pG(oku):null,beklenen:pG(r.p),bant:[pG(r.p-tolPa),pG(r.p+tolPa)],kirmizi:null},grafik,lejant:[['ana','Tartıma göre beklenen'],['bant','Kabul aralığı']]});
     h+=`<h2>Karışım oranı</h2>`+Gorsel.bilesim(r.parts,RENKLER,ADLAR)+`<div class="tablo-kap"><table><thead><tr><th>Gaz</th><th>Mol %</th><th>Kütle %</th><th>kg</th><th>m³</th></tr></thead><tbody>`;
     for(const p of r.parts) h+=`<tr><td>${nokta(p.key)}${GAZ[p.key].ad}</td><td>${fmt(p.x*100,3)}</td><td>${fmt(p.w*100,3)}</td><td>${fmt(p.kg,3)}</td><td>${fmt(p.m3,3)}</td></tr>`;
@@ -1679,7 +1717,7 @@ function hesaplaSiparis(){
     const araIle=ara&&ara.kucukler.includes(s.key);
     h+=`<tr><td class="sol">${i+1}. ${nokta(s.key)}${GAZ[s.key].ad}${araIle?' <span class="yan">ara karışımla</span>':''}</td><td>${kgYaz(s.addKg)}</td><td>${kgYaz(s.cumKg)}</td><td>${s.liquid?'<span class="yan">tartımla</span> ':''}${pm}${s.phase?` <span class="yan">${s.phase}</span>`:''}</td><td class="${s.hata!=null&&s.hata>2?'uyari-hucre':''}">${s.hata!=null?'%'+fmt(s.hata,s.hata<0.1?3:1):''}</td></tr>`;
   });
-  h+=`</tbody></table></div><p class="bilgi">Kütleler tüp darası üzerine eklenecek miktarlardır ve siparişin esasıdır; ara basınçlar gazların tamamen karıştığı kabulüyle kontrol amaçlı verilir. ${Math.abs(dT-hT)>1e-9?`Son basınç ${fmt(dT,1)} °C'de ${fP(r.pDolum)}, ${fmt(hT,1)} °C'de ${fP(r.pHedef)} olur.`:`Son basınç ${fmt(hT,1)} °C'de ${fP(r.pHedef)} olur.`} Dolumdan sonra tüpü yuvarlayarak ya da bekleterek homojenleştirin ve GC ile doğrulayın.</p>`;
+  h+=`</tbody></table></div><p class="bilgi">Kütleler tüp darası üzerine eklenecek miktarlardır ve siparişin esasıdır; ara basınçlar gazların tamamen karıştığı kabulüyle kontrol amaçlı verilir. ${Math.abs(dT-hT)>1e-9?`Son basınç ${fmt(dT,1)} °C'de ${fP(r.pDolum)}, ${fmt(hT,1)} °C'de ${fP(r.pHedef)} olur.`:`Son basınç ${fmt(hT,1)} °C'de ${fP(r.pHedef)} olur.`} Dolumdan sonra tüpü yuvarlayarak ya da bekleterek homojenleştirin ve GC ile doğrulayın.${r.ayrisma?` Karışım, tüp boşalırken ${fmt(r.ayrisma.T-273.15,0)} °C'nin üstünde tutulduğu sürece tek faz kalır.`:''}</p>`;
   if(ara){
     const dg=GAZ[ara.dengeKey].ad;
     h+=`<h2>Ara karışım önerisi</h2><div class="ara-karisim">
@@ -1947,7 +1985,7 @@ function analizeGoreIcerik(r,a){
   let parts=null, temel='';
   if(r.yontem==='Basınç' && r.V>0 && isFinite(r.T) && !x.some(c=>c.key==='C2H2')){
     const Pa=kayitBasinci(r);
-    if(Pa>0){ try{ const q=C.byPressure({comps:x,V_L:r.V,P_abs:Pa,Pg_bar:Pa/1e5-(r.patm||S.patm),T:r.T+273.15,ref,residual:r.kalan||null,target15_abs:null}); if(!q.error){ parts=q.parts.map(p=>({key:p.key,x:p.x,kg:p.kg,m3:p.m3})); temel='basinc'; } }catch(_){} }
+    if(Pa>0){ try{ const q=C.byPressure({comps:x,V_L:r.V,P_abs:Pa,Pg_bar:Pa/1e5-(r.patm||S.patm),T:r.T+273.15,ref,residual:r.kalan||null,target15_abs:null,ayrisma:false}); if(!q.error){ parts=q.parts.map(p=>({key:p.key,x:p.x,kg:p.kg,m3:p.m3})); temel='basinc'; } }catch(_){} }
   }
   if(!parts && r.kg>0){
     const Mmix=x.reduce((t,c)=>t+c.x*G.molarMass(c.key),0), n=r.kg/Mmix;
@@ -2228,7 +2266,7 @@ function gcHesapla(){
     let out={m3:null,kg:null};
     if(comps&&comps.length&&!asetilen&&V>0&&isFinite(P)&&isFinite(T)){
       const Pa=absPa(P);
-      if(Pa>0){ try{ const r=C.byPressure({comps,V_L:V,P_abs:Pa,Pg_bar:barG(Pa)+(S.olcum==='g'?0:-S.patm),T:T+273.15,ref:R,residual:null,target15_abs:null}); if(!r.error){ out={m3:r.m3,kg:r.kg}; tm3+=r.m3; tkg+=r.kg; say++; } else hataVar=true; }catch(_){ hataVar=true; } }
+      if(Pa>0){ try{ const r=C.byPressure({comps,V_L:V,P_abs:Pa,Pg_bar:barG(Pa)+(S.olcum==='g'?0:-S.patm),T:T+273.15,ref:R,residual:null,target15_abs:null,ayrisma:false}); if(!r.error){ out={m3:r.m3,kg:r.kg}; tm3+=r.m3; tkg+=r.kg; say++; } else hataVar=true; }catch(_){ hataVar=true; } }
     }
     if(m) m.textContent=out.m3!=null?fmt(out.m3,3):''; if(k) k.textContent=out.kg!=null?fmt(out.kg,3):'';
     return out;

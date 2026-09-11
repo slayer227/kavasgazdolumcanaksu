@@ -1,5 +1,5 @@
 // Gaz Dolum Hesaplayıcı: çevrimdışı çalışma için önbellek
-const SURUM="gaz-dolum-v2";
+const SURUM='gaz-dolum-v2';
 const DOSYALAR=['./','index.html','manifest.webmanifest','simge-192.png','simge-512.png','simge-maskelenebilir-512.png','apple-touch-icon.png'];
 self.addEventListener('install',e=>{ e.waitUntil(caches.open(SURUM).then(c=>c.addAll(DOSYALAR)).then(()=>self.skipWaiting())); });
 self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==SURUM).map(x=>caches.delete(x)))).then(()=>self.clients.claim())); });
