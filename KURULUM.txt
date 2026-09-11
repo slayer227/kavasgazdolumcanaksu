@@ -1,0 +1,46 @@
+GAZ DOLUM HESAPLAYICI - TELEFONA KURULUM
+========================================
+
+Telefonun programı bir uygulama gibi kurabilmesi için bu klasörün bir web
+adresinden (https) yayınlanması gerekir. Telefon, bilgisayardaki bir dosyayı
+doğrudan uygulama olarak kuramaz.
+
+1) KLASÖRÜ YAYINLAYIN (bir kez)
+   Bu klasördeki dosyaların hepsini, üzerinde değişiklik yapmadan, şu
+   seçeneklerden birine yükleyin:
+   - Şirketinizin kendi web sunucusu ya da intraneti (bilgi işlem birimi)
+   - GitHub Pages, Netlify, Cloudflare Pages gibi ücretsiz statik site
+     servisleri (ücretsiz hesap açıp klasörü yüklemeniz yeterlidir)
+   Size https:// ile başlayan bir adres verilir.
+
+   Not: Yayınlanan dosyalarda hiçbir kayıt yoktur. Kayıtlarınız, notlarınız ve
+   analizleriniz her zaman kullandığınız cihazın kendisinde kalır; sunucuya
+   gönderilmez.
+
+2) TELEFONA EKLEYİN
+   Android (Chrome): Adresi açın > sağ üstteki üç nokta > "Uygulamayı yükle"
+                     ya da "Ana ekrana ekle".
+   iPhone (Safari):  Adresi açın > Paylaş düğmesi > "Ana Ekrana Ekle".
+
+   Ana ekranda "Gaz Dolum" simgesi oluşur ve tam ekran açılır. İlk açılıştan
+   sonra internet olmadan da çalışır.
+
+3) KAYITLARI BİLGİSAYARA AKTARMA
+   Telefon tarayıcıları bilgisayardaki gibi bir klasöre otomatik yazamaz;
+   kayıtlar telefonda tutulur. Bilgisayardaki kayıt klasörüne aktarmak için:
+   - Telefonda: Kayıtlar > Yedek al (bir .json dosyası oluşur)
+   - Dosyayı bilgisayara gönderin (e-posta, WhatsApp, USB vb.)
+   - Bilgisayarda: Kayıtlar > Yedekten yükle > dosyayı seçin
+   Aynı kayıt iki kez eklenmez; yedeği tekrar yüklemek sorun çıkarmaz.
+   Telefonda sildiğiniz kayıtlar bu yolla bilgisayardan silinmez.
+
+   iPhone'da Safari, uzun süre açılmayan sitelerin verilerini silebilir.
+   Programı ana ekrana ekleyip kullanın ve düzenli yedek alın.
+
+4) GÜNCELLEME
+   Programın yeni sürümünü aldığınızda aynı adrese dosyaları yeniden yükleyin.
+   Telefon uygulamayı internete bağlıyken bir sonraki açılışında günceller.
+   Kayıtlarınız güncellemeden etkilenmez.
+
+Bilgisayarda kullanmaya devam etmek için index.html dosyasını Chrome ya da
+Edge ile açabilirsiniz; masaüstü klasörüne otomatik kayıt orada çalışır.
