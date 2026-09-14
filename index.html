@@ -384,8 +384,20 @@ details ul{padding-left:18px}
 .kd-etiket .etiket-kutu{margin-bottom:4px}
 .etiket.durgun{cursor:default}
 .gc-etiket-duzen{margin:0 0 10px}
+
+/* Açılır menü filtreleri */
+.menu-filtreler{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 14px;margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid var(--cizgi-acik)}
+.menu-filtreler:empty{display:none}
+.menu-filtre{display:flex;flex-direction:column;gap:3px;min-width:0}
+.menu-filtre>span{font-size:12.5px;color:var(--ikincil)}
+.menu-filtre .giris{max-width:none;background:#fff}
+.menu-filtre select{border:0;background:transparent;padding:7px 6px 7px 9px;max-width:230px;min-width:120px;font-size:14.5px}
+.menu-filtre.etkin .giris{border-color:var(--hat);box-shadow:inset 2px 0 0 var(--hat)}
+.menu-filtre.etkin>span{color:var(--hat);font-weight:500}
+.menu-filtreler>.metin-dugme{padding-bottom:8px}
+@media (max-width:560px){.menu-filtre{flex:1 1 140px}.menu-filtre select{max-width:none;width:100%}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-@media print{.kontrol{break-inside:avoid}.sira-ok,.kd-etiket button,.gc-etiket-duzen button{display:none!important}.sira-dugme{color:var(--ikincil)!important}.ust .ayarlar,.sekmeler,.girdi,.kaydet,details,.dugmeler,.filtre,.sil,.tehlikeli,.not-form,.not-dugmeler,.tost{display:none!important}.duzen{display:block}body{background:#fff}}
+@media print{.kontrol{break-inside:avoid}.menu-filtreler{display:none!important}.sira-ok,.kd-etiket button,.gc-etiket-duzen button{display:none!important}.sira-dugme{color:var(--ikincil)!important}.ust .ayarlar,.sekmeler,.girdi,.kaydet,details,.dugmeler,.filtre,.sil,.tehlikeli,.not-form,.not-dugmeler,.tost{display:none!important}.duzen{display:block}body{background:#fff}}
 </style>
 </head>
 <body>
@@ -1253,8 +1265,8 @@ const S={
        ksatir:[{k:'CO2',v:''},{k:'Ar',v:''}],kV:'50',kTT:'15',kPok:'',ktol:'3',ktT:'',
        ssatir:[{k:'O2',v:'30',u:'mol',d:false},{k:'Ar',v:'120',u:'mol',d:false},{k:'N2',v:'',u:'mol',d:true}],sV:'50',sP:'200',sHT:'15',sDT:'15',sR:'10'},
   kayit:[], notlar:[], form:{tup:'',musteri:'',not:'',tarih:'',tarihElle:false,tarihHatali:false,etiketler:[]},
-  filtre:{ara:'',donem:'tum',etiketler:[],veya:false,sira:'tarih',yon:-1}, etiketDepo:[], etiketDuzenle:null, etiketDuzenleGiris:'', notForm:{baslik:'',metin:'',duzenle:null}, notAra:'',
-  analizler:[], gcRef:{}, silinenler:{}, gc:{gorunum:'yeni',ara:'',acik:null,form:null,son:null,filtre:{etiketler:[],veya:false,sira:'tarih',yon:-1}}
+  filtre:{ara:'',donem:'tum',etiketler:[],veya:false,sira:'tarih',yon:-1,gaz:'',V:'',P:'',musteri:'',yontem:''}, etiketDepo:[], etiketDuzenle:null, etiketDuzenleGiris:'', notForm:{baslik:'',metin:'',duzenle:null}, notAra:'',
+  analizler:[], gcRef:{}, silinenler:{}, gc:{gorunum:'yeni',ara:'',acik:null,form:null,son:null,filtre:{etiketler:[],veya:false,sira:'tarih',yon:-1,musteri:'',gaz:'',durum:'',parti:''}}
 };
 let sonHesap=null;
 
@@ -1527,7 +1539,7 @@ document.addEventListener('click',async e=>{
     if(g&&g.value.trim()){ o.etiketler=o.etiketler||[]; etiketEkle(o.etiketler,g.value); }
     S.etiketDuzenle=null; S.etiketDuzenleGiris='';
     await etiketSakla(o);
-    if(S.sekme==='gc'){ const g=$('#gc-etiket-filtre'); if(g) g.innerHTML=etiketFiltresi('gc'); cizGcListe(); if(S.gc.acik) cizGcDetay(S.gc.acik,false); } else { const el=$('#kayit-etiket-filtre'); if(el) el.innerHTML=etiketFiltresi('kayit'); cizKayitGovde(); }
+    if(S.sekme==='gc'){ const g=$('#gc-etiket-filtre'); if(g) g.innerHTML=etiketFiltresi('gc'); cizGcListe(); if(S.gc.acik) cizGcDetay(S.gc.acik,false); } else { const el=$('#kayit-etiket-filtre'); if(el) el.innerHTML=etiketFiltresi('kayit'); menuFiltreCiz('kayit'); cizKayitGovde(); }
     return;
   }
   o.etiketler=o.etiketler||[];
@@ -1548,6 +1560,60 @@ document.addEventListener('keydown',async e=>{
   else if(e.key==='Escape'){ S.etiketDuzenle=null; S.etiketDuzenleGiris=''; if(S.sekme==='gc'){ const g=$('#gc-etiket-filtre'); if(g) g.innerHTML=etiketFiltresi('gc'); cizGcListe(); if(S.gc.acik) cizGcDetay(S.gc.acik,false); } else cizKayitGovde(); }
 });
 document.addEventListener('input',e=>{ if(e.target.dataset&&e.target.dataset.etiketkayitgiris) S.etiketDuzenleGiris=e.target.value; });
+
+// ---------- Açılır menü filtreleri ----------
+const sayiMetni=(v,d=1)=>v==null||v===''||isNaN(v)?'':fmt(Number(v),d);
+function basincDegeri(r){ const m=/-?[\d.,]+/.exec(r.P||''); return m?num(m[0]):NaN; }
+const KAYIT_MENU={
+  gaz:{ad:'Gaz / karışım',bos:'Tümü',al:r=>r.gaz||'',etiket:v=>v},
+  musteri:{ad:'Müşteri',bos:'Tümü',al:r=>r.musteri||'',etiket:v=>v},
+  V:{ad:'Su hacmi',bos:'Tümü',al:r=>{ const v=Number(r.V); return isFinite(v)&&r.V!==''?String(v):''; },etiket:v=>`${sayiMetni(v)} L`,sayi:true},
+  P:{ad:'Basınç',bos:'Tümü',al:r=>{ const v=basincDegeri(r); return isFinite(v)?String(Math.round(v)):''; },etiket:(v,r)=>`${sayiMetni(v,0)} ${r&&r.P&&/bar a/.test(r.P)?'bar a':birimP()}`,sayi:true},
+  yontem:{ad:'Yöntem',bos:'Tümü',al:r=>r.yontem||'',etiket:v=>v}
+};
+const GC_MENU={
+  musteri:{ad:'Müşteri',bos:'Tümü',al:a=>a.musteri||'',etiket:v=>v},
+  gaz:{ad:'İçerdiği gaz',bos:'Tümü',al:a=>a.sonuc.map(r=>r.key),coklu:true,etiket:v=>GAZ[v]?GAZ[v].ad:v},
+  parti:{ad:'Parti no',bos:'Tümü',al:a=>a.partiNo||'',etiket:v=>v},
+  durum:{ad:'Durum',bos:'Tümü',al:a=>a.genel===true?'uygun':a.genel===false?'degil':'yok',etiket:v=>({uygun:'Uygun',degil:'Uygun değil',yok:'Değerlendirilmemiş'}[v]||v)}
+};
+function menuUyar(r,f,tanim,atla){
+  for(const [k,t] of Object.entries(tanim)){
+    if(k===atla || !f[k]) continue;
+    const d=t.al(r);
+    if(t.coklu ? !d.includes(f[k]) : String(d)!==f[k]) return false;
+  }
+  return true;
+}
+function menuSecenekleri(kap,alan){
+  const gc=kap==='gc', tanim=gc?GC_MENU:KAYIT_MENU, f=gc?S.gc.filtre:S.filtre, t=tanim[alan];
+  const kaynak=(gc?gcFiltreli(alan):filtreliKayitlar(alan));
+  const m=new Map();
+  for(const r of kaynak){
+    const dler=t.coklu?t.al(r):[t.al(r)];
+    for(const d of dler){ if(d===''||d==null) continue; const k=String(d); const o=m.get(k); if(o) o.n++; else m.set(k,{v:k,n:1,ornek:r}); }
+  }
+  const liste=[...m.values()];
+  liste.sort((a,b)=>t.sayi?Number(a.v)-Number(b.v):String(t.etiket(a.v,a.ornek)).localeCompare(String(t.etiket(b.v,b.ornek)),'tr',{numeric:true}));
+  if(f[alan] && !liste.some(x=>x.v===f[alan])) liste.push({v:f[alan],n:0,ornek:null});
+  return liste;
+}
+function menuHtml(kap){
+  const gc=kap==='gc', tanim=gc?GC_MENU:KAYIT_MENU, f=gc?S.gc.filtre:S.filtre;
+  const parcalar=Object.entries(tanim).map(([alan,t])=>{
+    const secenek=menuSecenekleri(kap,alan);
+    if(!secenek.length && !f[alan]) return '';
+    return `<label class="menu-filtre${f[alan]?' etkin':''}"><span>${t.ad}</span><div class="giris"><select data-menufiltre="${alan}" data-menukap="${kap}" aria-label="${t.ad} filtresi">
+      <option value="">${t.bos}</option>
+      ${secenek.map(x=>`<option value="${esc(x.v)}" ${f[alan]===x.v?'selected':''}>${esc(t.etiket(x.v,x.ornek))}${x.n?` (${x.n})`:''}</option>`).join('')}
+    </select></div></label>`;
+  }).filter(Boolean).join('');
+  const etkin=Object.keys(tanim).filter(k=>f[k]);
+  return parcalar?`<div class="menu-filtreler" data-menukapsayfa="${kap}">${parcalar}${etkin.length?`<button class="metin-dugme" data-menutemizle="${kap}">Seçimleri temizle</button>`:''}</div>`:'';
+}
+function menuFiltreCiz(kap){
+  const el=document.getElementById(kap==='gc'?'gc-menu-filtre':'kayit-menu-filtre'); if(el) el.innerHTML=menuHtml(kap);
+}
 
 // ---------- Tablo sıralama ----------
 const KAYIT_SIRA={
@@ -2265,10 +2331,10 @@ function kayitDetayHtml(r,link){
 
 // ---------- Kayıt sayfası ----------
 const DONEM={tum:'Tümü',bugun:'Bugün',hafta:'Son 7 gün',ay:'Bu ay'};
-function filtreliKayitlar(){
+function filtreliKayitlar(atla){
   const f=S.filtre, ara=f.ara.trim().toLocaleLowerCase('tr-TR'), simdi=new Date();
   const bas={tum:0,bugun:new Date(simdi.getFullYear(),simdi.getMonth(),simdi.getDate()).getTime(),hafta:simdi.getTime()-7*864e5,ay:new Date(simdi.getFullYear(),simdi.getMonth(),1).getTime()}[f.donem];
-  return S.kayit.filter(r=>olcumZamani(r)>=bas && etiketUyar(r,f) && (!ara || [r.tupNo,r.musteri,r.gaz,r.not,r.yontem,...(r.etiketler||[])].join(' ').toLocaleLowerCase('tr-TR').includes(ara)));
+  return S.kayit.filter(r=>olcumZamani(r)>=bas && etiketUyar(r,f) && menuUyar(r,f,KAYIT_MENU,atla) && (!ara || [r.tupNo,r.musteri,r.gaz,r.not,r.yontem,...(r.etiketler||[])].join(' ').toLocaleLowerCase('tr-TR').includes(ara)));
 }
 function cizKayitSayfasi(){
   kok.innerHTML=`<section class="sayfa">
@@ -2278,6 +2344,7 @@ function cizKayitSayfasi(){
       <div class="giris arama"><input id="ara" data-filtre="ara" placeholder="Müşteri, tüp no, gaz, not veya etiket ara" value="${esc(S.filtre.ara)}" autocomplete="off" aria-label="Kayıtlarda ara"></div>
       <div class="mod" role="group" aria-label="Dönem">${Object.entries(DONEM).map(([k,v])=>`<button data-donem="${k}" aria-pressed="${S.filtre.donem===k}">${v}</button>`).join('')}</div>
     </div>
+    <div id="kayit-menu-filtre">${menuHtml('kayit')}</div>
     <div id="kayit-etiket-filtre">${etiketFiltresi('kayit')}</div>
     <div id="kayit-govde"></div>
   </section>`;
@@ -2383,7 +2450,7 @@ function cizGcSayfasi(){
   let h=`<section class="sayfa gc-sayfa"><div class="sayfa-ust"><div><h2 class="sayfa-baslik">GC analizi</h2><p class="depo-bilgi">Pik alanlarından bileşim yüzdesi. Her gazın saf hali ya da derişimi bilinen bir referans, kalibrasyon noktası olarak kullanılır.</p></div>
     <div class="mod" role="group" aria-label="Görünüm"><button data-gcgorunum="yeni" aria-pressed="${g.gorunum==='yeni'}">${g.form.duzenle?'Düzenlenen analiz':'Yeni analiz'}</button><button data-gcgorunum="kayitlar" aria-pressed="${g.gorunum==='kayitlar'}">Analiz kayıtları (${S.analizler.length})</button></div></div>`;
   if(g.gorunum==='yeni') h+=gcFormHtml();
-  else h+=`<div class="filtre"><div class="giris arama"><input id="gc-ara" data-gcara="1" placeholder="Müşteri, analiz no, parti, tüp seri no veya etiket ara" value="${esc(g.ara)}" autocomplete="off" aria-label="Analizlerde ara"></div><button class="dugme ikincil" id="gc-csv">CSV indir</button></div><div id="gc-etiket-filtre">${etiketFiltresi('gc')}</div><div id="gc-liste"></div><div id="gc-detay"></div>`;
+  else h+=`<div class="filtre"><div class="giris arama"><input id="gc-ara" data-gcara="1" placeholder="Müşteri, analiz no, parti, tüp seri no veya etiket ara" value="${esc(g.ara)}" autocomplete="off" aria-label="Analizlerde ara"></div><button class="dugme ikincil" id="gc-csv">CSV indir</button></div><div id="gc-menu-filtre">${menuHtml('gc')}</div><div id="gc-etiket-filtre">${etiketFiltresi('gc')}</div><div id="gc-liste"></div><div id="gc-detay"></div>`;
   kok.innerHTML=h+`</section>`;
   if(g.gorunum==='yeni'){ gcHesapla(); if(g.form.kayitSecAcik) cizGcKayitListe(); } else { cizGcListe(); if(g.acik) cizGcDetay(g.acik,false); }
 }
@@ -2527,9 +2594,9 @@ function gcKaydiOlustur(){
 }
 function bilesimMetni(sonuc){ return [...sonuc].sort((a,b)=>b.sonuc-a.sonuc).map(r=>`${GAZ[r.key].f} %${fmt(r.sonuc,r.sonuc<1?3:2)}`).join(', '); }
 
-function gcFiltreli(){
+function gcFiltreli(atla){
   const q=S.gc.ara.trim().toLocaleLowerCase('tr-TR');
-  return S.analizler.filter(a=>etiketUyar(a,S.gc.filtre) && (!q||[a.analizNo,a.musteri,a.seriNo,a.partiNo,...(a.etiketler||[]),...a.tupler.map(t=>t.seri),...a.sonuc.map(r=>GAZ[r.key].ad)].join(' ').toLocaleLowerCase('tr-TR').includes(q)));
+  return S.analizler.filter(a=>etiketUyar(a,S.gc.filtre) && menuUyar(a,S.gc.filtre,GC_MENU,atla) && (!q||[a.analizNo,a.musteri,a.seriNo,a.partiNo,...(a.etiketler||[]),...a.tupler.map(t=>t.seri),...a.sonuc.map(r=>GAZ[r.key].ad)].join(' ').toLocaleLowerCase('tr-TR').includes(q)));
 }
 function cizGcListe(){
   const el=$('#gc-liste'); if(!el) return;
@@ -2592,8 +2659,16 @@ function gcYazdir(id){
 kok.addEventListener('input',e=>{
   const t=e.target, d=t.dataset; if(S.sekme!=='gc') return;
   const f=S.gc.form;
-  if(d.gcf){ f[d.gcf]=t.value; if(['sP','sT','rP','rT'].includes(d.gcf)) gcHesapla(); return; }
-  if(d.gcara){ S.gc.ara=t.value; cizGcListe(); return; }
+  if(d.gcf){
+    f[d.gcf]=t.value;
+    if(d.gcf==='seriNo' && !f.musteri.trim()){
+      const r=sonDolumKaydi(t.value);
+      if(r&&r.musteri){ f.musteri=r.musteri; const m=document.getElementById('gc-musteri'); if(m&&!m.value.trim()) m.value=r.musteri; bildir(`Müşteri, ${r.tupNo} dolum kaydından alındı.`); }
+    }
+    if(['sP','sT','rP','rT'].includes(d.gcf)) gcHesapla();
+    return;
+  }
+  if(d.gcara){ S.gc.ara=t.value; menuFiltreCiz('gc'); cizGcListe(); return; }
   if(d.gctoplumetin){ f.toplu=t.value; return; }
   if(d.gckayitara){ f.kayitAra=t.value; cizGcKayitListe(); return; }
   if(d.gcsatir!==undefined && t.type!=='checkbox' && t.tagName!=='SELECT'){
@@ -2616,13 +2691,13 @@ kok.addEventListener('change',e=>{
     if(r && (row.oto || !String(row.P).trim())){ Object.assign(row,kayittanTupSatiri(r),{seri:t.value.trim()}); cizGcSayfasi(); bildir(`${r.tupNo} için su hacmi, basınç ve sıcaklık ${r.zaman||tarihMetni(r.ts)} tarihli dolum kaydından alındı.`); }
     return;
   }
-  if(d.gcf==='seriNo'){ const r=sonDolumKaydi(t.value); if(r&&r.musteri&&!f.musteri.trim()){ f.musteri=r.musteri; const m=document.getElementById('gc-musteri'); if(m) m.value=r.musteri; bildir(`Müşteri, ${r.tupNo} dolum kaydından alındı.`); } return; }
+
   if(d.gcsatir!==undefined && d.gcalan==='denge'){ f.satir.forEach((r,i)=>{ r.denge = i===+d.gcsatir ? t.checked : false; }); cizGcSayfasi(); return; }
 });
 kok.addEventListener('click',async e=>{
   if(S.sekme!=='gc') return;
   const t=e.target.closest('button'); if(!t) return;
-  if(t.dataset.etiketfil!==undefined||t.dataset.etiketmod||t.dataset.etikettemizle||t.dataset.sirala) return; // genel dinleyici ele alır
+  if(t.dataset.etiketfil!==undefined||t.dataset.etiketmod||t.dataset.etikettemizle||t.dataset.sirala||t.dataset.menutemizle) return; // genel dinleyici ele alır
   const d=t.dataset, f=S.gc.form;
   if(d.gcgorunum){ S.gc.gorunum=d.gcgorunum; cizGcSayfasi(); return; }
   if(d.gchazir!==undefined){
@@ -2711,7 +2786,7 @@ $('#patm').addEventListener('input',e=>{ const v=num(e.target.value); if(v>0.5&&
 kok.addEventListener('input',e=>{
   const t=e.target;
   if(t.dataset.form){ S.form[t.dataset.form]=t.value; return; }
-  if(t.dataset.filtre){ S.filtre.ara=t.value; cizKayitGovde(); return; }
+  if(t.dataset.filtre){ S.filtre.ara=t.value; menuFiltreCiz('kayit'); cizKayitGovde(); return; }
   if(t.dataset.notform){ S.notForm[t.dataset.notform]=t.value; return; }
   if(t.dataset.notara){ S.notAra=t.value; cizNotGovde(); return; }
   if(t.dataset.bag && t.type!=='checkbox' && t.tagName!=='SELECT'){
@@ -2729,6 +2804,13 @@ kok.addEventListener('input',e=>{
 });
 kok.addEventListener('change',async e=>{
   const t=e.target;
+  if(t.dataset.menufiltre){
+    const kap=t.dataset.menukap, gc=kap==='gc', f=gc?S.gc.filtre:S.filtre;
+    f[t.dataset.menufiltre]=t.value;
+    if(gc){ S.gc.acik=null; menuFiltreCiz('gc'); const g=$('#gc-etiket-filtre'); if(g) g.innerHTML=etiketFiltresi('gc'); cizGcListe(); $('#gc-detay').innerHTML=''; }
+    else { menuFiltreCiz('kayit'); const el=$('#kayit-etiket-filtre'); if(el) el.innerHTML=etiketFiltresi('kayit'); cizKayitGovde(); }
+    return;
+  }
   if(t.id==='yedek-yukle' && t.files && t.files[0]){
     try{
       const veri=JSON.parse(await t.files[0].text());
@@ -2765,7 +2847,13 @@ kok.addEventListener('click',async e=>{
   if(d.etiketfil!==undefined){
     const gc=S.sekme==='gc', f=gc?S.gc.filtre:S.filtre, k=etiketAnahtari(d.etiketfil);
     if(f.etiketler.some(x=>etiketAnahtari(x)===k)) f.etiketler=f.etiketler.filter(x=>etiketAnahtari(x)!==k); else f.etiketler.push(d.etiketfil);
-    if(gc){ S.gc.acik=null; cizGcSayfasi(); } else { const el=$('#kayit-etiket-filtre'); if(el) el.innerHTML=etiketFiltresi('kayit'); cizKayitGovde(); }
+    if(gc){ S.gc.acik=null; cizGcSayfasi(); } else { const el=$('#kayit-etiket-filtre'); if(el) el.innerHTML=etiketFiltresi('kayit'); menuFiltreCiz('kayit'); cizKayitGovde(); }
+    return;
+  }
+  if(d.menutemizle){
+    const gc=d.menutemizle==='gc', f=gc?S.gc.filtre:S.filtre, tanim=gc?GC_MENU:KAYIT_MENU;
+    for(const k of Object.keys(tanim)) f[k]='';
+    if(gc){ S.gc.acik=null; menuFiltreCiz('gc'); cizGcListe(); $('#gc-detay').innerHTML=''; } else { menuFiltreCiz('kayit'); cizKayitGovde(); }
     return;
   }
   if(d.sirala){
