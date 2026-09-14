@@ -186,11 +186,11 @@ details ul{padding-left:18px}
 
 /* Kayıt ekleme alanı */
 .kaydet{display:block}
-.kaydet-alanlar{display:grid;grid-template-columns:minmax(200px,230px) 150px 1fr 1.3fr;gap:0 12px}
+.kaydet-alanlar{display:grid;grid-template-columns:minmax(190px,215px) 130px 1fr 1.1fr 1.1fr;gap:0 12px}
 .kaydet-alanlar .alan{margin:0 0 10px}
 .kaydet-alanlar .giris{max-width:none}
 .kaydet-alt{display:flex;align-items:center;gap:14px}
-@media (max-width:1100px){.kaydet-alanlar{grid-template-columns:minmax(200px,230px) 1fr 1fr}.kaydet-alanlar .genis{grid-column:1/-1}}
+@media (max-width:1250px){.kaydet-alanlar{grid-template-columns:minmax(190px,215px) 1fr 1fr}.kaydet-alanlar .genis{grid-column:1/-1}}
 @media (max-width:600px){.kaydet-alanlar{grid-template-columns:1fr 1fr}.kaydet-alanlar .tarih-alani{grid-column:1/-1}}
 /* Sayfalar */
 .sayfa{padding:22px 28px 60px;max-width:1400px}
@@ -324,7 +324,8 @@ details ul{padding-left:18px}
 .tarih-alani .giris.elle{border-color:var(--uyari);box-shadow:inset 3px 0 0 var(--uyari)}
 .tarih-ipucu{font-size:12px;color:var(--ikincil);margin-top:3px;min-height:18px}
 .kucuk-dugme{font-size:12px;padding:0 0 0 6px}
-.gc-numune{grid-template-columns:minmax(200px,230px) repeat(4,minmax(140px,1fr))}
+.gc-numune{grid-template-columns:minmax(190px,215px) repeat(4,minmax(125px,1fr)) minmax(150px,1.2fr)}
+@media (max-width:1350px){.gc-numune{grid-template-columns:minmax(190px,215px) repeat(3,1fr)}}
 @media (max-width:1000px){.gc-numune{grid-template-columns:1fr 1fr}.gc-numune .tarih-alani{grid-column:1/-1;max-width:260px}}
 
 /* Dolum kaydı ayrıntısı ve analiz eşleştirme */
@@ -343,8 +344,48 @@ details ul{padding-left:18px}
 .gc-kayit-tablo{width:auto;min-width:min(100%,720px)}
 .gc-kayit-tablo input{width:17px;height:17px;accent-color:var(--hat)}
 .gc-kayit-sec .kaydet-alt{margin-top:8px}
+
+/* Etiketler */
+.etiket-kutu{display:flex;flex-wrap:wrap;align-items:center;gap:4px;border:1px solid var(--cizgi);border-radius:3px;background:#fff;padding:3px 4px;min-height:38px}
+.etiket-kutu:focus-within{border-color:var(--hat);box-shadow:0 0 0 1px var(--hat)}
+.etiket-secili{display:contents}
+.etiket-kutu input{border:0;outline:0;background:transparent;padding:4px 6px;flex:1 1 90px;min-width:70px;font-size:14.5px}
+.etiket{display:inline-flex;align-items:center;gap:4px;background:var(--hat-acik);color:#0A4B63;border:1px solid #BBD7E2;border-radius:11px;padding:2px 8px;font-size:12.5px;line-height:1.5;white-space:nowrap;max-width:100%}
+.etiket button{border:0;background:none;color:inherit;cursor:pointer;padding:0 0 0 2px;font-size:14px;line-height:1;opacity:.65}
+.etiket button:hover{opacity:1}
+.etiket.mini{cursor:pointer;font-size:12px;padding:1px 7px}
+.etiket.mini:hover{border-color:var(--hat)}
+.etiket-oneri{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.etiket-one{border:1px dashed var(--cizgi);background:none;border-radius:11px;padding:1px 8px;font-size:12px;color:var(--ikincil);cursor:pointer}
+.etiket-one:hover{border-color:var(--hat);border-style:solid;color:var(--hat)}
+.etiket-filtre{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid var(--cizgi-acik)}
+.etiket-filtre:empty{display:none}
+.ef-baslik{font-size:13px;color:var(--ikincil)}
+.ef-liste{display:flex;flex-wrap:wrap;gap:5px;flex:1 1 320px}
+.etiket-sec{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--cizgi);background:#fff;border-radius:12px;padding:3px 10px;font-size:13px;cursor:pointer}
+.etiket-sec:hover{border-color:var(--hat)}
+.etiket-sec.secili{background:var(--hat);border-color:var(--hat);color:#fff}
+.ef-say{font-size:11.5px;opacity:.7}
+.ef-mod{font-size:13px}
+.etiket-satir{display:flex;flex-wrap:wrap;gap:3px;max-width:210px}
+.etiket-hucre{white-space:normal;min-width:120px}
+@media (max-width:600px){.etiket-alani{grid-column:1/-1}}
+
+/* Sıralanabilir başlıklar */
+.kayit-tablo th{padding:0}
+.sira-dugme{display:inline-flex;align-items:center;gap:5px;width:100%;border:0;background:none;font:inherit;color:var(--ikincil);font-weight:500;cursor:pointer;padding:7px 10px;justify-content:flex-end;white-space:nowrap}
+.kayit-tablo th.sol .sira-dugme{justify-content:flex-start}
+.sira-dugme:hover{color:var(--murekkep);background:rgba(10,90,120,.06)}
+.kayit-tablo th.sirali .sira-dugme{color:var(--murekkep)}
+.sira-ok{font-size:10px;color:var(--hat)}
+/* Kayıtta etiket düzenleme */
+.kd-etiket{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:0 0 12px}
+.kd-etiket.duzenleniyor{display:block;max-width:520px}
+.kd-etiket .etiket-kutu{margin-bottom:4px}
+.etiket.durgun{cursor:default}
+.gc-etiket-duzen{margin:0 0 10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-@media print{.kontrol{break-inside:avoid}.ust .ayarlar,.sekmeler,.girdi,.kaydet,details,.dugmeler,.filtre,.sil,.tehlikeli,.not-form,.not-dugmeler,.tost{display:none!important}.duzen{display:block}body{background:#fff}}
+@media print{.kontrol{break-inside:avoid}.sira-ok,.kd-etiket button,.gc-etiket-duzen button{display:none!important}.sira-dugme{color:var(--ikincil)!important}.ust .ayarlar,.sekmeler,.girdi,.kaydet,details,.dugmeler,.filtre,.sil,.tehlikeli,.not-form,.not-dugmeler,.tost{display:none!important}.duzen{display:block}body{background:#fff}}
 </style>
 </head>
 <body>
@@ -1211,9 +1252,9 @@ const S={
   kar:{mod:'basinc',satir:[{k:'CO2',v:'18'},{k:'Ar',v:'82'}],V:'50',P:'200',T:'15',kalan:false,kP:'0',kT:'20',hedef:'200',hT:'15',tol:'3',tT:'',
        ksatir:[{k:'CO2',v:''},{k:'Ar',v:''}],kV:'50',kTT:'15',kPok:'',ktol:'3',ktT:'',
        ssatir:[{k:'O2',v:'30',u:'mol',d:false},{k:'Ar',v:'120',u:'mol',d:false},{k:'N2',v:'',u:'mol',d:true}],sV:'50',sP:'200',sHT:'15',sDT:'15',sR:'10'},
-  kayit:[], notlar:[], form:{tup:'',musteri:'',not:'',tarih:'',tarihElle:false,tarihHatali:false},
-  filtre:{ara:'',donem:'tum'}, notForm:{baslik:'',metin:'',duzenle:null}, notAra:'',
-  analizler:[], gcRef:{}, silinenler:{}, gc:{gorunum:'yeni',ara:'',acik:null,form:null,son:null}
+  kayit:[], notlar:[], form:{tup:'',musteri:'',not:'',tarih:'',tarihElle:false,tarihHatali:false,etiketler:[]},
+  filtre:{ara:'',donem:'tum',etiketler:[],veya:false,sira:'tarih',yon:-1}, etiketDepo:[], etiketDuzenle:null, etiketDuzenleGiris:'', notForm:{baslik:'',metin:'',duzenle:null}, notAra:'',
+  analizler:[], gcRef:{}, silinenler:{}, gc:{gorunum:'yeni',ara:'',acik:null,form:null,son:null,filtre:{etiketler:[],veya:false,sira:'tarih',yon:-1}}
 };
 let sonHesap=null;
 
@@ -1361,6 +1402,198 @@ function gosterge(etiket,m3,kg,alt1='',alt2=''){
 }
 const satirD=(a,b)=>`<div><dt>${a}</dt><dd>${b}</dd></div>`;
 const uyarilar=w=>w&&w.length?`<ul class="uyarilar">${w.map(x=>`<li>${x}</li>`).join('')}</ul>`:'';
+// ---------- Etiketler ----------
+const ETIKET_SINIR=24, ETIKET_UZUNLUK=28;
+const etiketAnahtari=v=>String(v||'').trim().toLocaleLowerCase('tr-TR').replace(/\s+/g,' ');
+function etiketDuzelt(v){ return String(v||'').trim().replace(/\s+/g,' ').replace(/[;,]/g,'').slice(0,ETIKET_UZUNLUK); }
+function etiketEkle(liste,ham){
+  const yeni=[];
+  for(const parca of String(ham).split(/[,;\n\t]/)){
+    const e=etiketDuzelt(parca); if(!e) continue;
+    const k=etiketAnahtari(e);
+    const varOlan=[...S.etiketDepo,...liste].find(x=>etiketAnahtari(x)===k); // daha önce kullanılan yazımı koru
+    const ad=varOlan||e;
+    if(!liste.some(x=>etiketAnahtari(x)===k) && liste.length<ETIKET_SINIR){ liste.push(ad); yeni.push(ad); }
+  }
+  return yeni;
+}
+function etiketHavuzu(){
+  const m=new Map();
+  for(const x of [...S.etiketDepo,...S.kayit.flatMap(r=>r.etiketler||[]),...S.analizler.flatMap(a=>a.etiketler||[])]){
+    const k=etiketAnahtari(x); if(!k) continue;
+    const o=m.get(k); if(o) o.n++; else m.set(k,{ad:x,n:1});
+  }
+  return [...m.values()].sort((a,b)=>b.n-a.n||a.ad.localeCompare(b.ad,'tr'));
+}
+function etiketiHatirla(etiketler){
+  let degisti=false;
+  if(!Array.isArray(S.etiketDepo)) S.etiketDepo=[];
+  for(const e of etiketler){ const k=etiketAnahtari(e); if(!S.etiketDepo.some(x=>etiketAnahtari(x)===k)){ S.etiketDepo.push(e); degisti=true; } }
+  if(S.etiketDepo.length>200) S.etiketDepo=S.etiketDepo.slice(-200);
+  if(degisti && typeof saklaEtiket==='function') saklaEtiket();
+  return degisti;
+}
+// Giriş alanı: kap = 'form' (dolum) ya da 'gc'
+function etiketKaynagi(kap){ return kap==='gc'?S.gc.form:S.form; }
+function etiketAlani(kap,etiket){
+  const f=etiketKaynagi(kap), id=kap+'-etiket-giris';
+  const havuz=etiketHavuzu().filter(x=>!f.etiketler.some(y=>etiketAnahtari(y)===etiketAnahtari(x.ad)));
+  return `<div class="alan etiket-alani" data-etiketalan="${kap}"><label for="${id}">${etiket}</label>
+    <div class="etiket-kutu"><div class="etiket-secili">${f.etiketler.map(e=>`<span class="etiket">${esc(e)}<button type="button" data-etiketsil="${esc(e)}" aria-label="${esc(e)} etiketini kaldır">×</button></span>`).join('')}</div><input id="${id}" data-etiketgiris="${kap}" list="etiket-havuzu" placeholder="${f.etiketler.length?'':'Etiket yazıp Enter'}" autocomplete="off" maxlength="${ETIKET_UZUNLUK}"></div>
+    <datalist id="etiket-havuzu">${havuz.slice(0,60).map(x=>`<option value="${esc(x.ad)}">`).join('')}</datalist>
+    ${havuz.length?`<div class="etiket-oneri">${havuz.slice(0,6).map(x=>`<button type="button" class="etiket-one" data-etiketone="${esc(x.ad)}">${esc(x.ad)}</button>`).join('')}</div>`:''}</div>`;
+}
+function etiketAlaniniCiz(kap){
+  const eski=document.querySelector(`[data-etiketalan="${kap}"]`); if(!eski) return;
+  const yeni=document.createElement('div'); yeni.innerHTML=etiketAlani(kap,eski.querySelector('label').textContent);
+  eski.replaceWith(yeni.firstElementChild);
+  document.getElementById(kap+'-etiket-giris')?.focus();
+}
+document.addEventListener('keydown',e=>{
+  const t=e.target, kap=t.dataset&&t.dataset.etiketgiris; if(!kap) return;
+  const f=etiketKaynagi(kap);
+  if(e.key==='Enter'||e.key===','||e.key===';'||e.key==='Tab'){
+    if(!t.value.trim()){ if(e.key!=='Tab') e.preventDefault(); return; }
+    e.preventDefault();
+    if(f.etiketler.length>=ETIKET_SINIR) return bildir(`En fazla ${ETIKET_SINIR} etiket eklenebilir.`);
+    etiketEkle(f.etiketler,t.value); t.value=''; etiketAlaniniCiz(kap);
+  }else if(e.key==='Backspace'&&!t.value&&f.etiketler.length){ f.etiketler.pop(); etiketAlaniniCiz(kap); }
+});
+document.addEventListener('change',e=>{ // listeden seçim
+  const t=e.target, kap=t.dataset&&t.dataset.etiketgiris; if(!kap||!t.value.trim()) return;
+  const f=etiketKaynagi(kap); etiketEkle(f.etiketler,t.value); t.value=''; etiketAlaniniCiz(kap);
+});
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-etiketsil],[data-etiketone]'); if(!b) return;
+  const kap=b.closest('[data-etiketalan]').dataset.etiketalan, f=etiketKaynagi(kap);
+  if(b.dataset.etiketsil){ const k=etiketAnahtari(b.dataset.etiketsil); f.etiketler=f.etiketler.filter(x=>etiketAnahtari(x)!==k); }
+  else etiketEkle(f.etiketler,b.dataset.etiketone);
+  etiketAlaniniCiz(kap);
+});
+// Etiket filtresi çubuğu
+function etiketFiltresi(kap){ // 'kayit' | 'gc'
+  const f=kap==='gc'?S.gc.filtre:S.filtre;
+  const kaynak=kap==='gc'?S.analizler:S.kayit;
+  const say=new Map();
+  for(const r of kaynak) for(const e of (r.etiketler||[])){ const k=etiketAnahtari(e); const o=say.get(k); if(o) o.n++; else say.set(k,{ad:e,n:1}); }
+  const liste=[...say.values()].sort((a,b)=>b.n-a.n||a.ad.localeCompare(b.ad,'tr'));
+  if(!liste.length) return '';
+  const secili=new Set(f.etiketler.map(etiketAnahtari));
+  return `<div class="etiket-filtre" data-etiketfiltre="${kap}"><span class="ef-baslik">Etiketler</span>
+    <div class="ef-liste">${liste.map(x=>`<button class="etiket-sec${secili.has(etiketAnahtari(x.ad))?' secili':''}" data-etiketfil="${esc(x.ad)}" aria-pressed="${secili.has(etiketAnahtari(x.ad))}">${esc(x.ad)}<span class="ef-say">${x.n}</span></button>`).join('')}</div>
+    ${f.etiketler.length>1?`<button class="metin-dugme ef-mod" data-etiketmod="1">${f.veya?'Herhangi biri':'Tümü'}</button>`:''}
+    ${f.etiketler.length?`<button class="metin-dugme" data-etikettemizle="1">Etiket filtresini temizle</button>`:''}</div>`;
+}
+function etiketUyar(r,f){
+  if(!f.etiketler.length) return true;
+  const sahip=new Set((r.etiketler||[]).map(etiketAnahtari));
+  const istenen=f.etiketler.map(etiketAnahtari);
+  return f.veya?istenen.some(k=>sahip.has(k)):istenen.every(k=>sahip.has(k));
+}
+const etiketRozetleri=r=>(r.etiketler||[]).length?`<div class="etiket-satir">${r.etiketler.map(e=>`<button class="etiket mini" data-etiketfil="${esc(e)}" title="${esc(e)} ile filtrele">${esc(e)}</button>`).join('')}</div>`:'';
+
+// ---------- Kayıtlı öğede etiket düzenleme ----------
+function etiketDuzenleHtml(o,kap){ // kap: 'kayit' | 'gc'
+  const acik=S.etiketDuzenle===o.id;
+  if(!acik) return `<div class="kd-etiket">${(o.etiketler||[]).length?`<div class="etiket-satir">${o.etiketler.map(e=>`<span class="etiket mini durgun">${esc(e)}</span>`).join('')}</div>`:'<span class="yan">Etiket yok</span>'}<button class="metin-dugme" data-etiketduzenle="${o.id}" data-etiketkap="${kap}">${(o.etiketler||[]).length?'Etiketleri düzenle':'Etiket ekle'}</button></div>`;
+  const havuz=etiketHavuzu().filter(x=>!(o.etiketler||[]).some(y=>etiketAnahtari(y)===etiketAnahtari(x.ad)));
+  return `<div class="kd-etiket duzenleniyor" data-etiketduzenlealan="${o.id}">
+    <div class="etiket-kutu"><div class="etiket-secili">${(o.etiketler||[]).map(e=>`<span class="etiket">${esc(e)}<button type="button" data-etiketkayitsil="${esc(e)}" aria-label="${esc(e)} etiketini kaldır">×</button></span>`).join('')}</div><input id="kayit-etiket-giris" data-etiketkayitgiris="1" list="etiket-havuzu" placeholder="Etiket yazıp Enter" autocomplete="off" maxlength="${ETIKET_UZUNLUK}" value="${esc(S.etiketDuzenleGiris)}"></div>
+    <datalist id="etiket-havuzu">${havuz.slice(0,60).map(x=>`<option value="${esc(x.ad)}">`).join('')}</datalist>
+    ${havuz.length?`<div class="etiket-oneri">${havuz.slice(0,6).map(x=>`<button type="button" class="etiket-one" data-etiketkayitone="${esc(x.ad)}">${esc(x.ad)}</button>`).join('')}</div>`:''}
+    <button class="metin-dugme" data-etiketbitti="1">Bitti</button></div>`;
+}
+function etiketSahibi(id){ return S.kayit.find(r=>r.id===id)||S.analizler.find(a=>a.id===id)||null; }
+async function etiketSakla(o){
+  o.guncel=Date.now();
+  etiketiHatirla(o.etiketler);
+  if(S.kayit.includes(o)) await saklaKayit(); else await saklaAnaliz();
+}
+function etiketDuzenleCiz(){
+  const o=etiketSahibi(S.etiketDuzenle); if(!o) return;
+  const kap=S.kayit.includes(o)?'kayit':'gc';
+  const el=document.querySelector(`[data-etiketduzenlealan="${o.id}"]`)||document.querySelector(`[data-etiketduzenle="${o.id}"]`)?.closest('.kd-etiket');
+  if(!el) return;
+  const yeni=document.createElement('div'); yeni.innerHTML=etiketDuzenleHtml(o,kap);
+  el.replaceWith(yeni.firstElementChild);
+  const g=document.getElementById('kayit-etiket-giris'); if(g){ g.focus(); g.value=S.etiketDuzenleGiris; }
+}
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('[data-etiketduzenle],[data-etiketbitti],[data-etiketkayitsil],[data-etiketkayitone]'); if(!b) return;
+  if(b.dataset.etiketduzenle){ S.etiketDuzenle=b.dataset.etiketduzenle; S.etiketDuzenleGiris=''; etiketDuzenleCiz(); return; }
+  const o=etiketSahibi(S.etiketDuzenle); if(!o) return;
+  if(b.dataset.etiketbitti){
+    const g=document.getElementById('kayit-etiket-giris');
+    if(g&&g.value.trim()){ o.etiketler=o.etiketler||[]; etiketEkle(o.etiketler,g.value); }
+    S.etiketDuzenle=null; S.etiketDuzenleGiris='';
+    await etiketSakla(o);
+    if(S.sekme==='gc'){ const g=$('#gc-etiket-filtre'); if(g) g.innerHTML=etiketFiltresi('gc'); cizGcListe(); if(S.gc.acik) cizGcDetay(S.gc.acik,false); } else { const el=$('#kayit-etiket-filtre'); if(el) el.innerHTML=etiketFiltresi('kayit'); cizKayitGovde(); }
+    return;
+  }
+  o.etiketler=o.etiketler||[];
+  if(b.dataset.etiketkayitsil){ const k=etiketAnahtari(b.dataset.etiketkayitsil); o.etiketler=o.etiketler.filter(x=>etiketAnahtari(x)!==k); }
+  else etiketEkle(o.etiketler,b.dataset.etiketkayitone);
+  await etiketSakla(o); etiketDuzenleCiz();
+});
+document.addEventListener('keydown',async e=>{
+  const t=e.target; if(!t.dataset||!t.dataset.etiketkayitgiris) return;
+  const o=etiketSahibi(S.etiketDuzenle); if(!o) return;
+  if(e.key==='Enter'||e.key===','||e.key===';'){
+    e.preventDefault(); if(!t.value.trim()) return;
+    o.etiketler=o.etiketler||[];
+    if(o.etiketler.length>=ETIKET_SINIR) return bildir(`En fazla ${ETIKET_SINIR} etiket eklenebilir.`);
+    etiketEkle(o.etiketler,t.value); S.etiketDuzenleGiris='';
+    await etiketSakla(o); etiketDuzenleCiz();
+  }else if(e.key==='Backspace'&&!t.value&&(o.etiketler||[]).length){ o.etiketler.pop(); await etiketSakla(o); etiketDuzenleCiz(); }
+  else if(e.key==='Escape'){ S.etiketDuzenle=null; S.etiketDuzenleGiris=''; if(S.sekme==='gc'){ const g=$('#gc-etiket-filtre'); if(g) g.innerHTML=etiketFiltresi('gc'); cizGcListe(); if(S.gc.acik) cizGcDetay(S.gc.acik,false); } else cizKayitGovde(); }
+});
+document.addEventListener('input',e=>{ if(e.target.dataset&&e.target.dataset.etiketkayitgiris) S.etiketDuzenleGiris=e.target.value; });
+
+// ---------- Tablo sıralama ----------
+const KAYIT_SIRA={
+  tarih:{ad:'Ölçüm tarihi',al:r=>olcumZamani(r),tip:'sayi',yon:-1},
+  tupNo:{ad:'Tüp no',al:r=>r.tupNo||'',tip:'metin',yon:1},
+  musteri:{ad:'Müşteri',al:r=>r.musteri||'',tip:'metin',yon:1},
+  gaz:{ad:'Gaz',al:r=>r.gaz||'',tip:'metin',yon:1},
+  yontem:{ad:'Yöntem',al:r=>r.yontem||'',tip:'metin',yon:1},
+  V:{ad:'Su hacmi L',al:r=>Number(r.V),tip:'sayi',yon:-1},
+  P:{ad:'Basınç',al:r=>{ const m=/-?[\d.,]+/.exec(r.P||''); return m?num(m[0]):NaN; },tip:'sayi',yon:-1},
+  T:{ad:'Sıcaklık °C',al:r=>Number(r.T),tip:'sayi',yon:-1},
+  m3:{ad:'m³',al:r=>r.m3,tip:'sayi',yon:-1},
+  kg:{ad:'kg',al:r=>r.kg,tip:'sayi',yon:-1},
+  etiket:{ad:'Etiketler',al:r=>(r.etiketler||[]).join(', '),tip:'metin',yon:1},
+  analiz:{ad:'GC analizi',al:r=>{ const l=kayitAnalizi(r,analizIndeksi(),dolumIndeksi()); return l?(l.analiz.genel===false?2:l.analiz.genel===true?1:3):4; },tip:'sayi',yon:1},
+  not:{ad:'Not',al:r=>r.not||'',tip:'metin',yon:1}
+};
+const GC_SIRA={
+  tarih:{ad:'Analiz tarihi',al:a=>olcumZamani(a),tip:'sayi',yon:-1},
+  analizNo:{ad:'Analiz no',al:a=>a.analizNo||'',tip:'metin',yon:1},
+  musteri:{ad:'Müşteri',al:a=>a.musteri||'',tip:'metin',yon:1},
+  seriNo:{ad:'Numune seri no',al:a=>a.seriNo||'',tip:'metin',yon:1},
+  partiNo:{ad:'Parti no',al:a=>a.partiNo||'',tip:'metin',yon:1},
+  etiket:{ad:'Etiketler',al:a=>(a.etiketler||[]).join(', '),tip:'metin',yon:1},
+  bilesim:{ad:'Bileşim',al:a=>bilesimMetni(a.sonuc),tip:'metin',yon:1},
+  tup:{ad:'Tüp',al:a=>a.tupler.length,tip:'sayi',yon:-1},
+  durum:{ad:'Durum',al:a=>a.genel===false?0:a.genel===true?1:2,tip:'sayi',yon:1}
+};
+function sirala(liste,tanim,f){
+  const t=tanim[f.sira]||tanim.tarih, yon=f.yon;
+  const anahtar=new Map(liste.map(r=>[r,t.al(r)]));
+  return liste.slice().sort((a,b)=>{
+    let x=anahtar.get(a), y=anahtar.get(b);
+    if(t.tip==='sayi'){ const bx=x==null||x===''||isNaN(x), by=y==null||y===''||isNaN(y); if(bx&&by) return 0; if(bx) return 1; if(by) return -1; return (x-y)*yon; }
+    const bx=!String(x).trim(), by=!String(y).trim(); if(bx&&by) return 0; if(bx) return 1; if(by) return -1;
+    return String(x).localeCompare(String(y),'tr',{numeric:true,sensitivity:'base'})*yon;
+  });
+}
+function basliklar(tanim,f,ozel={}){
+  return Object.entries(tanim).map(([k,t])=>{
+    const aktif=f.sira===k, ok=aktif?(f.yon===1?'▲':'▼'):'';
+    const sinif=(ozel[k]||'')+(aktif?' sirali':'');
+    return `<th class="${sinif}"><button class="sira-dugme" data-sirala="${k}" aria-label="${t.ad} sütununa göre sırala">${t.ad}<span class="sira-ok">${ok}</span></button></th>`;
+  }).join('');
+}
+
 // ---------- Ölçüm / analiz tarihi alanı ----------
 const iki=n=>String(n).padStart(2,'0');
 function tarihDegeri(ms){ const d=new Date(ms); return `${d.getFullYear()}-${iki(d.getMonth()+1)}-${iki(d.getDate())}T${iki(d.getHours())}:${iki(d.getMinutes())}`; }
@@ -1411,6 +1644,7 @@ function kaydetAlani(){
     ${tarihAlani('form','Ölçüm tarihi')}
     <div class="alan"><label for="form.tup">Tüp no</label><div class="giris"><input id="form.tup" data-form="tup" value="${esc(f.tup)}" autocomplete="off"></div></div>
     <div class="alan"><label for="form.musteri">Müşteri</label><div class="giris"><input id="form.musteri" data-form="musteri" value="${esc(f.musteri)}" autocomplete="off" list="musteri-listesi"></div></div>
+    ${etiketAlani('form','Etiketler')}
     <div class="alan genis"><label for="form.not">Not</label><div class="giris"><input id="form.not" data-form="not" value="${esc(f.not)}" autocomplete="off"></div></div>
   </div><datalist id="musteri-listesi">${[...new Set(S.kayit.map(r=>r.musteri).filter(Boolean))].map(m=>`<option value="${esc(m)}">`).join('')}</datalist>
   <div class="kaydet-alt"><button class="dugme" id="kaydet">Kayda ekle</button><span class="bildirim" id="bildirim"></span></div></div>`;
@@ -1775,7 +2009,8 @@ const kimlik=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 function kaydet(anahtar,deger){ if(Klasor.durum==='bagli'){ klasoreKaydet(); return Promise.resolve(true); } return Depo.yaz(anahtar,deger); }
 const saklaKayit=()=>kaydet(KAYIT_ANAHTAR,S.kayit);
 const saklaNot=()=>kaydet(NOT_ANAHTAR,S.notlar);
-const saklaAyar=()=>kaydet(AYAR_ANAHTAR,{ref:S.ref,olcum:S.olcum,patm:S.patm});
+const saklaAyar=()=>kaydet(AYAR_ANAHTAR,{ref:S.ref,olcum:S.olcum,patm:S.patm,etiketDepo:S.etiketDepo});
+const saklaEtiket=saklaAyar;
 
 // ---------- Klasöre kayıt (Chrome / Edge dosya sistemi erişimi) ----------
 const VERI_DOSYA='gaz-dolum-veriler.json';
@@ -1801,7 +2036,7 @@ async function klasorOku(h){
   return {veri:v,zaman:f.lastModified};
 }
 async function dosyaYaz(dir,ad,icerik){ const fh=await dir.getFileHandle(ad,{create:true}); const w=await fh.createWritable(); await w.write(icerik); await w.close(); return fh; }
-function veriPaketi(){ return {uygulama:'gaz-dolum-hesaplayici',surum:3,guncellendi:new Date().toISOString(),ayarlar:{ref:S.ref,olcum:S.olcum,patm:S.patm},kayitlar:S.kayit,notlar:S.notlar,analizler:S.analizler,gcReferanslari:S.gcRef,silinenler:S.silinenler}; }
+function veriPaketi(){ return {uygulama:'gaz-dolum-hesaplayici',surum:3,guncellendi:new Date().toISOString(),ayarlar:{ref:S.ref,olcum:S.olcum,patm:S.patm,etiketDepo:S.etiketDepo},kayitlar:S.kayit,notlar:S.notlar,analizler:S.analizler,gcReferanslari:S.gcRef,silinenler:S.silinenler}; }
 const zamanDamgasi=x=>x.guncel||x.ts||0;
 function birlestir(dosya){
   if(!dosya) return;
@@ -1812,7 +2047,7 @@ function birlestir(dosya){
   const sinir=Date.now()-180*864e5; for(const k of Object.keys(sil)) if(sil[k]<sinir) delete sil[k];
   S.silinenler=sil;
 }
-function ayarlariUygula(a){ if(!a) return; if(REF[a.ref]) S.ref=a.ref; if(a.olcum==='g'||a.olcum==='a') S.olcum=a.olcum; if(a.patm>0.5&&a.patm<1.2) S.patm=a.patm; $('#ref').value=S.ref; $('#olcum').value=S.olcum; $('#patm').value=String(S.patm).replace('.',','); }
+function ayarlariUygula(a){ if(!a) return; if(Array.isArray(a.etiketDepo)) S.etiketDepo=[...new Set([...(S.etiketDepo||[]),...a.etiketDepo])].slice(-200); if(REF[a.ref]) S.ref=a.ref; if(a.olcum==='g'||a.olcum==='a') S.olcum=a.olcum; if(a.patm>0.5&&a.patm<1.2) S.patm=a.patm; $('#ref').value=S.ref; $('#olcum').value=S.olcum; $('#patm').value=String(S.patm).replace('.',','); }
 function notlarMetni(){
   const l=[...S.notlar].sort((a,b)=>zamanDamgasi(b)-zamanDamgasi(a));
   return l.map(n=>`${tarihMetni(n.ts)}${n.guncel&&n.guncel!==n.ts?` (düzenlendi ${tarihMetni(n.guncel)})`:''}\r\n${n.baslik?n.baslik+'\r\n':''}${n.metin.replace(/\n/g,'\r\n')}`).join('\r\n\r\n----------------------------------------\r\n\r\n')||'Henüz not yok.';
@@ -1999,7 +2234,7 @@ function kayitDetayHtml(r,link){
   const pl=kayitBilesimi(r);
   let h=`<div class="kayit-detay"><div class="kd-ust"><div><div class="yan">Dolum ayrıntısı</div><div class="kd-baslik">${esc(r.tupNo||'Tüp no girilmemiş')}${r.musteri?` <span class="yan">${esc(r.musteri)}</span>`:''}</div></div>`;
   if(link){ const a=link.analiz; h+=`<div class="kd-analiz">${a.genel===true?'<span class="etiket-uygun">Spesifikasyona uygun</span>':a.genel===false?'<span class="etiket-degil">Spesifikasyon dışı</span>':''}<button class="metin-dugme" data-analizac="${a.id}">${esc(a.analizNo||'Analizi')} aç</button></div>`; }
-  h+=`</div><dl class="ayrinti kd-bilgi">${satirD('Ölçüm tarihi',esc(r.zaman||tarihMetni(r.ts)))}${satirD('Yöntem',esc(r.yontem))}${r.V!==''&&r.V!=null?satirD('Su hacmi',`${fmt(r.V,1)} L`):''}${r.P?satirD('Basınç',esc(r.P)):''}${r.T!==''&&r.T!=null&&!isNaN(r.T)?satirD('Sıcaklık',`${fmt(r.T,1)} °C`):''}${r.not?satirD('Not',esc(r.not)):''}</dl>`;
+  h+=`</div>${etiketDuzenleHtml(r,'kayit')}<dl class="ayrinti kd-bilgi">${satirD('Ölçüm tarihi',esc(r.zaman||tarihMetni(r.ts)))}${satirD('Yöntem',esc(r.yontem))}${r.V!==''&&r.V!=null?satirD('Su hacmi',`${fmt(r.V,1)} L`):''}${r.P?satirD('Basınç',esc(r.P)):''}${r.T!==''&&r.T!=null&&!isNaN(r.T)?satirD('Sıcaklık',`${fmt(r.T,1)} °C`):''}${r.not?satirD('Not',esc(r.not)):''}</dl>`;
   if(!link){
     if(pl.parts){ h+=`<div class="tablo-kap"><table><thead><tr><th class="sol">Gaz</th><th>Mol %</th><th>kg</th><th>m³</th></tr></thead><tbody>${pl.parts.map(p=>`<tr><td class="sol">${nokta(p.key)}${GAZ[p.key].ad}</td><td>${fmt(p.x*100,3)}</td><td>${fmt(p.kg,3)}</td><td>${fmt(p.m3,3)}</td></tr>`).join('')}</tbody></table></div>`; }
     h+=`<p class="yan">${r.tupNo?`Bu dolum için GC analizi bulunamadı. GC analizinde numune ya da parti tüpü seri no olarak <b>${esc(r.tupNo)}</b> girildiğinde analiz sonucu burada görünür.`:'Tüp no girilmediği için bu kayıt bir GC analiziyle eşleştirilemez.'}</p></div>`;
@@ -2033,16 +2268,17 @@ const DONEM={tum:'Tümü',bugun:'Bugün',hafta:'Son 7 gün',ay:'Bu ay'};
 function filtreliKayitlar(){
   const f=S.filtre, ara=f.ara.trim().toLocaleLowerCase('tr-TR'), simdi=new Date();
   const bas={tum:0,bugun:new Date(simdi.getFullYear(),simdi.getMonth(),simdi.getDate()).getTime(),hafta:simdi.getTime()-7*864e5,ay:new Date(simdi.getFullYear(),simdi.getMonth(),1).getTime()}[f.donem];
-  return S.kayit.filter(r=>olcumZamani(r)>=bas && (!ara || [r.tupNo,r.musteri,r.gaz,r.not,r.yontem].join(' ').toLocaleLowerCase('tr-TR').includes(ara)));
+  return S.kayit.filter(r=>olcumZamani(r)>=bas && etiketUyar(r,f) && (!ara || [r.tupNo,r.musteri,r.gaz,r.not,r.yontem,...(r.etiketler||[])].join(' ').toLocaleLowerCase('tr-TR').includes(ara)));
 }
 function cizKayitSayfasi(){
   kok.innerHTML=`<section class="sayfa">
     <div class="sayfa-ust"><div><h2 class="sayfa-baslik">Kayıtlar</h2><div id="klasor-bilgi">${klasorBilgiHtml(false)}</div></div>
       <div class="dugmeler"><button class="dugme ikincil" id="csv">CSV indir</button><button class="dugme ikincil" id="kopyala">Tabloyu kopyala</button><button class="dugme ikincil" id="yedek-al">Yedek al</button><label class="dugme ikincil dosya-dugme">Yedekten yükle<input type="file" id="yedek-yukle" accept=".json,application/json"></label></div></div>
     <div class="filtre">
-      <div class="giris arama"><input id="ara" data-filtre="ara" placeholder="Müşteri, tüp no, gaz veya not ara" value="${esc(S.filtre.ara)}" autocomplete="off" aria-label="Kayıtlarda ara"></div>
+      <div class="giris arama"><input id="ara" data-filtre="ara" placeholder="Müşteri, tüp no, gaz, not veya etiket ara" value="${esc(S.filtre.ara)}" autocomplete="off" aria-label="Kayıtlarda ara"></div>
       <div class="mod" role="group" aria-label="Dönem">${Object.entries(DONEM).map(([k,v])=>`<button data-donem="${k}" aria-pressed="${S.filtre.donem===k}">${v}</button>`).join('')}</div>
     </div>
+    <div id="kayit-etiket-filtre">${etiketFiltresi('kayit')}</div>
     <div id="kayit-govde"></div>
   </section>`;
   cizKayitGovde();
@@ -2050,17 +2286,17 @@ function cizKayitSayfasi(){
 function cizKayitGovde(){
   const el=$('#kayit-govde'); if(!el) return;
   if(!S.kayit.length){ el.innerHTML=`<div class="bos">Henüz kayıt yok. Tek gaz ya da karışım hesabının altındaki "Kayda ekle" ile dolumları buraya ekleyin.</div>`; return; }
-  const liste=filtreliKayitlar().slice().sort((a,b)=>olcumZamani(b)-olcumZamani(a));
+  const liste=sirala(filtreliKayitlar(),KAYIT_SIRA,S.filtre);
   const oz={}; let m3=0, kg=0;
   liste.forEach(r=>{ const k=r.gaz+'|'+r.ref; oz[k]=oz[k]||{gaz:r.gaz,ref:r.ref,n:0,m3:0,kg:0}; oz[k].n++; oz[k].m3+=r.m3; oz[k].kg+=r.kg; m3+=r.m3; kg+=r.kg; });
   let h=`<div class="ozet-satir"><span><b>${liste.length}</b> dolum</span>${S.kayit.length!==liste.length?`<span class="yan">toplam ${S.kayit.length} kayıttan</span>`:''}</div>`;
   if(!liste.length){ el.innerHTML=h+`<div class="bos">Bu filtreye uyan kayıt yok.</div>`; return; }
-  h+=`<div class="tablo-kap"><table class="kayit-tablo"><thead><tr><th class="sol">Ölçüm tarihi</th><th class="sol">Tüp no</th><th class="sol">Müşteri</th><th class="sol">Gaz</th><th class="sol">Yöntem</th><th>Su hacmi L</th><th>Basınç</th><th>Sıcaklık °C</th><th>m³</th><th>kg</th><th class="sol">GC analizi</th><th class="sol">Not</th><th></th></tr></thead><tbody>`;
+  h+=`<div class="tablo-kap"><table class="kayit-tablo"><thead><tr>${basliklar(KAYIT_SIRA,S.filtre,{tarih:'sol',tupNo:'sol',musteri:'sol',gaz:'sol',yontem:'sol',etiket:'sol',analiz:'sol',not:'sol'})}<th></th></tr></thead><tbody>`;
   const aIdx=analizIndeksi(), dIdx=dolumIndeksi();
   for(const r of liste){
     const link=kayitAnalizi(r,aIdx,dIdx), acik=S.acikKayit===r.id;
-    h+=`<tr${acik?' class="secili"':''}><td class="sol">${esc(r.zaman||tarihMetni(r.ts))}</td><td class="sol">${esc(r.tupNo||'')}</td><td class="sol">${esc(r.musteri||'')}</td><td class="sol">${esc(r.gaz)}${r.bilesen?`<div class="yan">${esc(r.bilesen)}</div>`:''}</td><td class="sol">${esc(r.yontem)}</td><td>${r.V===''||r.V==null?'':fmt(r.V,1)}</td><td>${esc(r.P||'')}</td><td>${r.T===''||r.T==null||isNaN(r.T)?'':fmt(r.T,1)}</td><td>${fmt(r.m3,3)}</td><td>${fmt(r.kg,3)}</td><td class="sol">${link?`<button class="metin-dugme" data-kayitdetay="${esc(r.id)}">${esc(link.analiz.analizNo||'Analiz')}</button> ${link.analiz.genel===true?'<span class="etiket-uygun">Uygun</span>':link.analiz.genel===false?'<span class="etiket-degil">Uygun değil</span>':''}`:'<span class="yan">—</span>'}</td><td class="sol not-hucre">${esc(r.not||'')}</td><td class="islem-hucre"><button class="metin-dugme" data-kayitdetay="${esc(r.id)}" aria-expanded="${acik}">${acik?'Kapat':'Ayrıntı'}</button> <button class="sil" data-sil="${esc(r.id)}" aria-label="Kaydı sil">Sil</button></td></tr>`;
-    if(acik) h+=`<tr class="detay-satir"><td colspan="13">${kayitDetayHtml(r,link)}</td></tr>`;
+    h+=`<tr${acik?' class="secili"':''}><td class="sol">${esc(r.zaman||tarihMetni(r.ts))}</td><td class="sol">${esc(r.tupNo||'')}</td><td class="sol">${esc(r.musteri||'')}</td><td class="sol">${esc(r.gaz)}${r.bilesen?`<div class="yan">${esc(r.bilesen)}</div>`:''}</td><td class="sol">${esc(r.yontem)}</td><td>${r.V===''||r.V==null?'':fmt(r.V,1)}</td><td>${esc(r.P||'')}</td><td>${r.T===''||r.T==null||isNaN(r.T)?'':fmt(r.T,1)}</td><td>${fmt(r.m3,3)}</td><td>${fmt(r.kg,3)}</td><td class="sol etiket-hucre">${etiketRozetleri(r)}</td><td class="sol">${link?`<button class="metin-dugme" data-kayitdetay="${esc(r.id)}">${esc(link.analiz.analizNo||'Analiz')}</button> ${link.analiz.genel===true?'<span class="etiket-uygun">Uygun</span>':link.analiz.genel===false?'<span class="etiket-degil">Uygun değil</span>':''}`:'<span class="yan">—</span>'}</td><td class="sol not-hucre">${esc(r.not||'')}</td><td class="islem-hucre"><button class="metin-dugme" data-kayitdetay="${esc(r.id)}" aria-expanded="${acik}">${acik?'Kapat':'Ayrıntı'}</button> <button class="sil" data-sil="${esc(r.id)}" aria-label="Kaydı sil">Sil</button></td></tr>`;
+    if(acik) h+=`<tr class="detay-satir"><td colspan="14">${kayitDetayHtml(r,link)}</td></tr>`;
   }
   h+=`</tbody></table></div>`;
   h+=`<h2>Gaz bazında toplam</h2><div class="tablo-kap"><table><thead><tr><th class="sol">Gaz</th><th>Tüp</th><th>m³</th><th>kg</th><th class="sol">m³ referansı</th></tr></thead><tbody>${Object.values(oz).map(o=>`<tr><td class="sol">${esc(o.gaz)}</td><td>${o.n}</td><td>${fmt(o.m3,3)}</td><td>${fmt(o.kg,3)}</td><td class="sol">${esc(o.ref)}</td></tr>`).join('')}</tbody></table></div>`;
@@ -2072,12 +2308,13 @@ function csvMetni(ayr,liste){
   const q=v=>{ const t=String(v??''); return /[;"\n\t]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t; };
   const sayi=(v,d)=>v===''||v==null||isNaN(v)?'':Number(v).toFixed(d).replace('.',',');
   const aIdx=analizIndeksi(), dIdx=dolumIndeksi();
-  const bas=['Ölçüm tarihi','Tüp no','Müşteri','Gaz','Yöntem','Su hacmi (L)','Basınç','Sıcaklık (°C)','m³','kg','Bileşenler','m³ referansı','Not','GC analiz no','GC analiz tarihi','GC sonucu','Analize göre m³','Analize göre kg','Analize göre bileşenler'];
+  const bas=['Ölçüm tarihi','Tüp no','Müşteri','Etiketler','Gaz','Yöntem','Su hacmi (L)','Basınç','Sıcaklık (°C)','m³','kg','Bileşenler','m³ referansı','Not','GC analiz no','GC analiz tarihi','GC sonucu','Analize göre m³','Analize göre kg','Analize göre bileşenler'];
   return [bas.join(ayr)].concat(liste.map(r=>{
+    const et=(r.etiketler||[]).join(', ');
     const link=kayitAnalizi(r,aIdx,dIdx); let ek=['','','','','',''];
     if(link){ const a=link.analiz, ic=analizeGoreIcerik(r,a); const p=ic.parts||[];
       ek=[a.analizNo||'',a.zaman||'',a.genel===true?'Uygun':a.genel===false?'Uygun değil':'',p.length?sayi(p.reduce((t,x)=>t+x.m3,0),3):'',p.length?sayi(p.reduce((t,x)=>t+x.kg,0),3):'',p.map(x=>`${GAZ[x.key].f} %${fmt(x.x*100,3)} ${fmt(x.kg,3)} kg / ${fmt(x.m3,3)} m³`).join('; ')]; }
-    return [r.zaman||tarihMetni(r.ts),r.tupNo||'',r.musteri||'',r.gaz,r.yontem,sayi(r.V,1),r.P||'',sayi(r.T,1),sayi(r.m3,3),sayi(r.kg,3),r.bilesen||'',r.ref,r.not||'',...ek].map(q).join(ayr);
+    return [r.zaman||tarihMetni(r.ts),r.tupNo||'',r.musteri||'',et,r.gaz,r.yontem,sayi(r.V,1),r.P||'',sayi(r.T,1),sayi(r.m3,3),sayi(r.kg,3),r.bilesen||'',r.ref,r.not||'',...ek].map(q).join(ayr);
   })).join('\r\n');
 }
 function indir(ad,icerik,tur){
@@ -2134,7 +2371,7 @@ function yeniGcForm(onceki){
   const tekrar=onceki?onceki.tekrar:2;
   const satir=onceki?onceki.satir.map(r=>({...r,alan:Array(tekrar).fill(''),refAlan:S.gcRef[r.k]?S.gcRef[r.k].alan:r.refAlan,refDer:S.gcRef[r.k]?S.gcRef[r.k].der:r.refDer})):[gcSatir('CO2','18','',false,tekrar),gcSatir('Ar','82','',true,tekrar)];
   const son=onceki&&onceki.tupler.length?onceki.tupler[onceki.tupler.length-1]:{V:'50',P:'',T:'15'};
-  return {tarih:'',tarihElle:false,tarihHatali:false,musteri:onceki?onceki.musteri:'',analizNo:'',seriNo:'',partiNo:'',tekrar,sartOn:onceki?onceki.sartOn:false,sP:onceki?onceki.sP:'1,01325',sT:onceki?onceki.sT:'25',rP:onceki?onceki.rP:'1,01325',rT:onceki?onceki.rT:'25',satir,tupler:[{seri:'',V:son.V,P:son.P,T:son.T}],duzenle:null,topluAcik:false,toplu:''};
+  return {tarih:'',tarihElle:false,tarihHatali:false,etiketler:onceki?[...onceki.etiketler]:[],musteri:onceki?onceki.musteri:'',analizNo:'',seriNo:'',partiNo:'',tekrar,sartOn:onceki?onceki.sartOn:false,sP:onceki?onceki.sP:'1,01325',sT:onceki?onceki.sT:'25',rP:onceki?onceki.rP:'1,01325',rT:onceki?onceki.rT:'25',satir,tupler:[{seri:'',V:son.V,P:son.P,T:son.T}],duzenle:null,topluAcik:false,toplu:''};
 }
 function musteriListesi(){ return [...new Set([...S.kayit.map(r=>r.musteri),...S.analizler.map(a=>a.musteri)].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr')); }
 const yuzde=(v,d=3)=>v==null||!isFinite(v)?'':fmt(v,d);
@@ -2146,7 +2383,7 @@ function cizGcSayfasi(){
   let h=`<section class="sayfa gc-sayfa"><div class="sayfa-ust"><div><h2 class="sayfa-baslik">GC analizi</h2><p class="depo-bilgi">Pik alanlarından bileşim yüzdesi. Her gazın saf hali ya da derişimi bilinen bir referans, kalibrasyon noktası olarak kullanılır.</p></div>
     <div class="mod" role="group" aria-label="Görünüm"><button data-gcgorunum="yeni" aria-pressed="${g.gorunum==='yeni'}">${g.form.duzenle?'Düzenlenen analiz':'Yeni analiz'}</button><button data-gcgorunum="kayitlar" aria-pressed="${g.gorunum==='kayitlar'}">Analiz kayıtları (${S.analizler.length})</button></div></div>`;
   if(g.gorunum==='yeni') h+=gcFormHtml();
-  else h+=`<div class="filtre"><div class="giris arama"><input id="gc-ara" data-gcara="1" placeholder="Müşteri, analiz no, parti ya da tüp seri no ara" value="${esc(g.ara)}" autocomplete="off" aria-label="Analizlerde ara"></div><button class="dugme ikincil" id="gc-csv">CSV indir</button></div><div id="gc-liste"></div><div id="gc-detay"></div>`;
+  else h+=`<div class="filtre"><div class="giris arama"><input id="gc-ara" data-gcara="1" placeholder="Müşteri, analiz no, parti, tüp seri no veya etiket ara" value="${esc(g.ara)}" autocomplete="off" aria-label="Analizlerde ara"></div><button class="dugme ikincil" id="gc-csv">CSV indir</button></div><div id="gc-etiket-filtre">${etiketFiltresi('gc')}</div><div id="gc-liste"></div><div id="gc-detay"></div>`;
   kok.innerHTML=h+`</section>`;
   if(g.gorunum==='yeni'){ gcHesapla(); if(g.form.kayitSecAcik) cizGcKayitListe(); } else { cizGcListe(); if(g.acik) cizGcDetay(g.acik,false); }
 }
@@ -2160,6 +2397,7 @@ function gcFormHtml(){
     <div class="alan"><label for="gc-analizNo">Analiz no</label>${giris('id="gc-analizNo" data-gcf="analizNo"',f.analizNo)}</div>
     <div class="alan"><label for="gc-seriNo">Numune tüp seri no</label>${giris('id="gc-seriNo" data-gcf="seriNo"',f.seriNo)}</div>
     <div class="alan"><label for="gc-partiNo">Parti no</label>${giris('id="gc-partiNo" data-gcf="partiNo"',f.partiNo)}</div>
+    ${etiketAlani('gc','Etiketler')}
   </div><datalist id="gc-musteriler">${musteriListesi().map(m=>`<option value="${esc(m)}">`).join('')}</datalist>`;
 
   h+=`<h2>Ölçüm</h2><div class="hazir">${HAZIR.map((p,i)=>`<button data-gchazir="${i}">${p.ad}</button>`).join('')}</div>`;
@@ -2280,7 +2518,7 @@ function gcKaydiOlustur(){
   const f=S.gc.form, a=S.gc.son&&S.gc.son.analiz;
   if(!a) return null;
   const ts=Date.now();
-  return {id:f.duzenle||kimlik(), ts, tarih:S.gc.kayitTarihi, zaman:tarihMetni(S.gc.kayitTarihi), musteri:f.musteri.trim(), analizNo:f.analizNo.trim(), seriNo:f.seriNo.trim(), partiNo:f.partiNo.trim(),
+  return {id:f.duzenle||kimlik(), ts, tarih:S.gc.kayitTarihi, zaman:tarihMetni(S.gc.kayitTarihi), musteri:f.musteri.trim(), analizNo:f.analizNo.trim(), seriNo:f.seriNo.trim(), partiNo:f.partiNo.trim(), etiketler:[...f.etiketler],
     tekrar:f.tekrar, sartOn:f.sartOn, sP:f.sP, sT:f.sT, rP:f.rP, rT:f.rT,
     girdi:f.satir.map(r=>({...r,alan:[...r.alan]})),
     sonuc:a.satirlar, toplamHam:a.toplamHam, normalize:a.normalize, zS:a.zS, genel:a.genel,
@@ -2291,23 +2529,24 @@ function bilesimMetni(sonuc){ return [...sonuc].sort((a,b)=>b.sonuc-a.sonuc).map
 
 function gcFiltreli(){
   const q=S.gc.ara.trim().toLocaleLowerCase('tr-TR');
-  return S.analizler.filter(a=>!q||[a.analizNo,a.musteri,a.seriNo,a.partiNo,...a.tupler.map(t=>t.seri),...a.sonuc.map(r=>GAZ[r.key].ad)].join(' ').toLocaleLowerCase('tr-TR').includes(q)).sort((x,y)=>olcumZamani(y)-olcumZamani(x));
+  return S.analizler.filter(a=>etiketUyar(a,S.gc.filtre) && (!q||[a.analizNo,a.musteri,a.seriNo,a.partiNo,...(a.etiketler||[]),...a.tupler.map(t=>t.seri),...a.sonuc.map(r=>GAZ[r.key].ad)].join(' ').toLocaleLowerCase('tr-TR').includes(q)));
 }
 function cizGcListe(){
   const el=$('#gc-liste'); if(!el) return;
   if(!S.analizler.length){ el.innerHTML=`<div class="bos">Henüz kayıtlı analiz yok. "Yeni analiz" görünümünde ölçümü girip kaydedin.</div>`; return; }
-  const l=gcFiltreli();
+  const l=sirala(gcFiltreli(),GC_SIRA,S.gc.filtre);
   if(!l.length){ el.innerHTML=`<div class="bos">Aramaya uyan analiz yok.</div>`; return; }
   const q=S.gc.ara.trim().toLocaleLowerCase('tr-TR');
-  el.innerHTML=`<div class="ozet-satir"><span><b>${l.length}</b> analiz</span></div><div class="tablo-kap"><table class="kayit-tablo"><thead><tr><th class="sol">Analiz tarihi</th><th class="sol">Analiz no</th><th class="sol">Müşteri</th><th class="sol">Numune seri no</th><th class="sol">Parti no</th><th class="sol">Bileşim</th><th>Tüp</th><th class="sol">Durum</th><th></th></tr></thead><tbody>${l.map(a=>{
+  el.innerHTML=`<div class="ozet-satir"><span><b>${l.length}</b> analiz</span></div><div class="tablo-kap"><table class="kayit-tablo"><thead><tr>${basliklar(GC_SIRA,S.gc.filtre,{tarih:'sol',analizNo:'sol',musteri:'sol',seriNo:'sol',partiNo:'sol',etiket:'sol',bilesim:'sol',durum:'sol'})}<th></th></tr></thead><tbody>${l.map(a=>{
     const eslesenTup=q?a.tupler.filter(t=>t.seri&&t.seri.toLocaleLowerCase('tr-TR').includes(q)).map(t=>t.seri):[];
-    return `<tr${S.gc.acik===a.id?' class="secili"':''}><td class="sol">${esc(a.zaman)}</td><td class="sol">${esc(a.analizNo)}</td><td class="sol">${esc(a.musteri)}</td><td class="sol">${esc(a.seriNo)}</td><td class="sol">${esc(a.partiNo)}${eslesenTup.length?`<div class="yan">tüp: ${esc(eslesenTup.join(', '))}</div>`:''}</td><td class="sol not-hucre">${esc(bilesimMetni(a.sonuc))}</td><td>${a.tupler.length}</td><td class="sol">${DURUM_ETIKET(a.genel)}</td><td class="islem-hucre"><button class="metin-dugme" data-gcac="${a.id}">Aç</button> <button class="sil" data-gcsil="${a.id}">Sil</button></td></tr>`;}).join('')}</tbody></table></div>`;
+    return `<tr${S.gc.acik===a.id?' class="secili"':''}><td class="sol">${esc(a.zaman)}</td><td class="sol">${esc(a.analizNo)}</td><td class="sol">${esc(a.musteri)}</td><td class="sol">${esc(a.seriNo)}</td><td class="sol">${esc(a.partiNo)}${eslesenTup.length?`<div class="yan">tüp: ${esc(eslesenTup.join(', '))}</div>`:''}</td><td class="sol etiket-hucre">${etiketRozetleri(a)}</td><td class="sol not-hucre">${esc(bilesimMetni(a.sonuc))}</td><td>${a.tupler.length}</td><td class="sol">${DURUM_ETIKET(a.genel)}</td><td class="islem-hucre"><button class="metin-dugme" data-gcac="${a.id}">Aç</button> <button class="sil" data-gcsil="${a.id}">Sil</button></td></tr>`;}).join('')}</tbody></table></div>`;
 }
 function gcDetayHtml(a){
   const dIdxR=dolumIndeksi();
   const hT=[...Array(a.tekrar).keys()];
   let h=`<div class="gc-detay-ust"><div><div class="yan">GC analiz raporu</div><h2 class="sayfa-baslik">${esc(a.analizNo||'Analiz no girilmemiş')}</h2></div>${a.genel!==null?`<div class="gc-karar ${a.genel?'uygun':'degil'}">${a.genel?'Spesifikasyona uygun':'Spesifikasyon dışı'}</div>`:''}</div>`;
   h+=`<dl class="ayrinti gc-bilgi">${satirD('Müşteri',esc(a.musteri)||'—')}${satirD('Analiz tarihi',esc(a.zaman))}${satirD('Numune tüp seri no',esc(a.seriNo)||'—')}${satirD('Parti no',esc(a.partiNo)||'—')}${satirD('Enjeksiyon tekrarı',a.tekrar)}${satirD('Enjeksiyon şartı düzeltmesi',a.sartOn?`referans ${esc(a.rP)} bar a, ${esc(a.rT)} °C; numune ${esc(a.sP)} bar a, ${esc(a.sT)} °C`:'yok')}</dl>`;
+  h+=`<div class="gc-etiket-duzen">${etiketDuzenleHtml(a,'gc')}</div>`;
   h+=Gorsel.bilesim(a.sonuc.map(r=>({key:r.key,x:Math.max(0,r.sonuc)/100})),RENKLER,ADLAR);
   h+=`<div class="tablo-kap"><table><thead><tr><th class="sol">Gaz</th><th>Referans %</th><th>Referans alanı</th>${hT.map(j=>`<th>Alan ${a.tekrar>1?j+1:''}</th>`).join('')}<th>Ortalama</th><th>RSD %</th><th>Sonuç %</th><th>Nominal %</th><th>Tolerans ±</th><th class="sol">Durum</th></tr></thead><tbody>`;
   a.sonuc.forEach((r,i)=>{ const gi=a.girdi[i]||{alan:[]};
@@ -2329,10 +2568,10 @@ function gcCsv(liste){
   const q=v=>{ const s=String(v??''); return /[;"\n\t]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
   const sayi=(v,d)=>v==null||!isFinite(v)?'':Number(v).toFixed(d).replace('.',',');
   const gazlar=[...new Set(liste.flatMap(a=>a.sonuc.map(r=>r.key)))];
-  const bas=['Analiz tarihi','Analiz no','Müşteri','Numune seri no','Parti no',...gazlar.map(k=>GAZ[k].ad+' %'),'Durum','Tüp seri no','Su hacmi (L)','Basınç','Sıcaklık (°C)','m³','kg','m³ referansı'];
+  const bas=['Analiz tarihi','Analiz no','Müşteri','Numune seri no','Parti no','Etiketler',...gazlar.map(k=>GAZ[k].ad+' %'),'Durum','Tüp seri no','Su hacmi (L)','Basınç','Sıcaklık (°C)','m³','kg','m³ referansı'];
   const satirlar=[];
   for(const a of liste){
-    const ortak=[a.zaman,a.analizNo,a.musteri,a.seriNo,a.partiNo,...gazlar.map(k=>{ const r=a.sonuc.find(x=>x.key===k); return r?sayi(r.sonuc,4):''; }),a.genel===true?'Uygun':a.genel===false?'Uygun değil':''];
+    const ortak=[a.zaman,a.analizNo,a.musteri,a.seriNo,a.partiNo,(a.etiketler||[]).join(', '),...gazlar.map(k=>{ const r=a.sonuc.find(x=>x.key===k); return r?sayi(r.sonuc,4):''; }),a.genel===true?'Uygun':a.genel===false?'Uygun değil':''];
     if(a.tupler.length) for(const t of a.tupler) satirlar.push([...ortak,t.seri,t.V,t.P?`${t.P} ${a.birim}`:'',t.T,sayi(t.m3,3),sayi(t.kg,3),a.ref]);
     else satirlar.push([...ortak,'','','','','','',a.ref]);
   }
@@ -2383,6 +2622,7 @@ kok.addEventListener('change',e=>{
 kok.addEventListener('click',async e=>{
   if(S.sekme!=='gc') return;
   const t=e.target.closest('button'); if(!t) return;
+  if(t.dataset.etiketfil!==undefined||t.dataset.etiketmod||t.dataset.etikettemizle||t.dataset.sirala) return; // genel dinleyici ele alır
   const d=t.dataset, f=S.gc.form;
   if(d.gcgorunum){ S.gc.gorunum=d.gcgorunum; cizGcSayfasi(); return; }
   if(d.gchazir!==undefined){
@@ -2429,7 +2669,7 @@ kok.addEventListener('click',async e=>{
     if(!k.analizNo && !k.seriNo) { bildir('Analiz no ya da numune tüp seri numarasından en az birini girin.'); document.getElementById('gc-analizNo')?.focus(); return; }
     const i=S.analizler.findIndex(x=>x.id===k.id);
     k.guncel=Date.now(); if(i>=0){ k.ts=S.analizler[i].ts; S.analizler[i]=k; } else S.analizler.push(k);
-    clearTimeout(gcRefZ); await kaydet(GCREF_ANAHTAR,S.gcRef); await saklaAnaliz(); sayaclar();
+    etiketiHatirla(k.etiketler); clearTimeout(gcRefZ); await kaydet(GCREF_ANAHTAR,S.gcRef); await saklaAnaliz(); sayaclar();
     S.gc.form=yeniGcForm(f); cizGcSayfasi();
     bildir(i>=0?'Analiz kaydı güncellendi.':'Analiz kaydedildi.');
     return;
@@ -2447,7 +2687,7 @@ kok.addEventListener('click',async e=>{
   }
   if(d.gcduzenle||d.gckopya){
     const a=S.analizler.find(x=>x.id===(d.gcduzenle||d.gckopya)); if(!a) return;
-    const form={tarih:d.gcduzenle?tarihDegeri(olcumZamani(a)):'',tarihElle:!!d.gcduzenle,tarihHatali:false,musteri:a.musteri,analizNo:d.gcduzenle?a.analizNo:'',seriNo:d.gcduzenle?a.seriNo:'',partiNo:d.gcduzenle?a.partiNo:'',tekrar:a.tekrar,sartOn:a.sartOn,sP:a.sP,sT:a.sT,rP:a.rP,rT:a.rT,
+    const form={tarih:d.gcduzenle?tarihDegeri(olcumZamani(a)):'',tarihElle:!!d.gcduzenle,tarihHatali:false,etiketler:[...(a.etiketler||[])],musteri:a.musteri,analizNo:d.gcduzenle?a.analizNo:'',seriNo:d.gcduzenle?a.seriNo:'',partiNo:d.gcduzenle?a.partiNo:'',tekrar:a.tekrar,sartOn:a.sartOn,sP:a.sP,sT:a.sT,rP:a.rP,rT:a.rT,
       satir:a.girdi.map(r=>({...r,alan:d.gcduzenle?[...r.alan]:Array(a.tekrar).fill('')})),
       tupler:d.gcduzenle&&a.tupler.length?a.tupler.map(x=>({seri:x.seri,V:x.V,P:x.P,T:x.T})):[{seri:'',V:a.tupler[0]?a.tupler[0].V:'50',P:a.tupler[0]?a.tupler[0].P:'',T:a.tupler[0]?a.tupler[0].T:'15'}],
       duzenle:d.gcduzenle?a.id:null,topluAcik:false,toplu:''};
@@ -2456,7 +2696,7 @@ kok.addEventListener('click',async e=>{
     return;
   }
   if(d.gcyazdir){ gcYazdir(d.gcyazdir); return; }
-  if(t.id==='gc-csv'){ const l=gcFiltreli(); if(!l.length) return bildir('İndirilecek analiz yok.'); indir('gc-analizleri-'+new Date().toISOString().slice(0,10)+'.csv','\ufeff'+gcCsv(l),'text/csv;charset=utf-8'); bildir('CSV dosyası indirildi.'); return; }
+  if(t.id==='gc-csv'){ const l=sirala(gcFiltreli(),GC_SIRA,S.gc.filtre); if(!l.length) return bildir('İndirilecek analiz yok.'); indir('gc-analizleri-'+new Date().toISOString().slice(0,10)+'.csv','\ufeff'+gcCsv(l),'text/csv;charset=utf-8'); bildir('CSV dosyası indirildi.'); return; }
 });
 
 // ---------- Olaylar ----------
@@ -2496,7 +2736,8 @@ kok.addEventListener('change',async e=>{
       const varK=new Set(S.kayit.map(r=>r.id)), varN=new Set(S.notlar.map(n=>n.id));
       let yk=0, yn=0, ya=0;
       const varA=new Set(S.analizler.map(a=>a.id));
-      if(!Array.isArray(veri)){ for(const a of (veri.analizler||[])){ if(a&&a.id&&Array.isArray(a.sonuc)&&!varA.has(a.id)){ S.analizler.push(a); ya++; } }
+      if(!Array.isArray(veri)){ if(veri.ayarlar&&Array.isArray(veri.ayarlar.etiketDepo)) S.etiketDepo=[...new Set([...S.etiketDepo,...veri.ayarlar.etiketDepo])].slice(-200);
+        for(const a of (veri.analizler||[])){ if(a&&a.id&&Array.isArray(a.sonuc)&&!varA.has(a.id)){ S.analizler.push(a); ya++; } }
         for(const [k,v] of Object.entries(veri.gcReferanslari||{})){ if(v&&(!S.gcRef[k]||(v.tarih||0)>(S.gcRef[k].tarih||0))) S.gcRef[k]=v; } }
       for(const r of kayit){ if(r && typeof r.m3==='number'){ if(!r.id) r.id=kimlik(); if(!varK.has(r.id)){ S.kayit.push(r); yk++; } } }
       for(const n of notlar){ if(n && typeof n.metin==='string'){ if(!n.id) n.id=kimlik(); if(!varN.has(n.id)){ S.notlar.push(n); yn++; } } }
@@ -2521,6 +2762,20 @@ kok.addEventListener('click',async e=>{
   const d=t.dataset;
   if(d.gaz){ S.tek.gaz=d.gaz; cizTekGirdi(); hesapla(); return; }
   if(d.mod){ S.kar.mod=d.mod; cizKarGirdi(); hesapla(); return; }
+  if(d.etiketfil!==undefined){
+    const gc=S.sekme==='gc', f=gc?S.gc.filtre:S.filtre, k=etiketAnahtari(d.etiketfil);
+    if(f.etiketler.some(x=>etiketAnahtari(x)===k)) f.etiketler=f.etiketler.filter(x=>etiketAnahtari(x)!==k); else f.etiketler.push(d.etiketfil);
+    if(gc){ S.gc.acik=null; cizGcSayfasi(); } else { const el=$('#kayit-etiket-filtre'); if(el) el.innerHTML=etiketFiltresi('kayit'); cizKayitGovde(); }
+    return;
+  }
+  if(d.sirala){
+    const gc=S.sekme==='gc', f=gc?S.gc.filtre:S.filtre, tanim=gc?GC_SIRA:KAYIT_SIRA;
+    if(f.sira===d.sirala) f.yon=-f.yon; else { f.sira=d.sirala; f.yon=(tanim[d.sirala]||{}).yon||1; }
+    if(gc) cizGcListe(); else cizKayitGovde();
+    return;
+  }
+  if(d.etiketmod){ const gc=S.sekme==='gc', f=gc?S.gc.filtre:S.filtre; f.veya=!f.veya; if(gc) cizGcSayfasi(); else { $('#kayit-etiket-filtre').innerHTML=etiketFiltresi('kayit'); cizKayitGovde(); } return; }
+  if(d.etikettemizle){ const gc=S.sekme==='gc', f=gc?S.gc.filtre:S.filtre; f.etiketler=[]; if(gc) cizGcSayfasi(); else { $('#kayit-etiket-filtre').innerHTML=etiketFiltresi('kayit'); cizKayitGovde(); } return; }
   if(d.donem){ S.filtre.donem=d.donem; document.querySelectorAll('[data-donem]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.donem===d.donem)); cizKayitGovde(); return; }
   const sl=S.kar.ssatir;
   if(d.sekle){ const bos=KARISIM_GAZ.find(g=>!sl.some(r=>r.k===g)); const dIdx=sl.findIndex(r=>r.d); const yeni={k:bos||'N2',v:'',u:'mol',d:false}; if(dIdx>=0) sl.splice(dIdx,0,yeni); else sl.push(yeni); cizKarGirdi(); hesapla(); return; }
@@ -2549,7 +2804,7 @@ kok.addEventListener('click',async e=>{
     if(!sonHesap) return;
     const tarih=kayitTarihi('form'); if(tarih==null) return;
     const ts=Date.now();
-    S.kayit.push({...sonHesap,refKey:S.ref,olcum:S.olcum,patm:S.patm,id:kimlik(),ts,tarih,zaman:tarihMetni(tarih),ref:REF[S.ref].ad,tupNo:S.form.tup.trim(),musteri:S.form.musteri.trim(),not:S.form.not.trim()});
+    S.kayit.push({...sonHesap,refKey:S.ref,olcum:S.olcum,patm:S.patm,id:kimlik(),ts,tarih,zaman:tarihMetni(tarih),ref:REF[S.ref].ad,etiketler:[...S.form.etiketler],tupNo:S.form.tup.trim(),musteri:S.form.musteri.trim(),not:S.form.not.trim()});
     S.form.tup=''; S.form.not='';
     const a=document.getElementById('form.tup'), b=document.getElementById('form.not'); if(a) a.value=''; if(b) b.value='';
     await saklaKayit(); sayaclar(); bildir(`Kaydedildi (${tarihMetni(tarih)}). Toplam ${S.kayit.length} kayıt.`);
@@ -2579,7 +2834,7 @@ kok.addEventListener('click',async e=>{
     catch(_){ bildir('Pano erişimi engellendi. CSV indir seçeneğini kullanın.'); }
     return;
   }
-  if(t.id==='yedek-al'){ indir('gaz-dolum-yedek-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({surum:2,tarih:new Date().toISOString(),kayitlar:S.kayit,notlar:S.notlar,analizler:S.analizler,gcReferanslari:S.gcRef,ayarlar:{ref:S.ref,olcum:S.olcum,patm:S.patm}},null,1),'application/json'); bildir('Yedek dosyası indirildi.'); return; }
+  if(t.id==='yedek-al'){ indir('gaz-dolum-yedek-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({surum:3,tarih:new Date().toISOString(),kayitlar:S.kayit,notlar:S.notlar,analizler:S.analizler,gcReferanslari:S.gcRef,ayarlar:{ref:S.ref,olcum:S.olcum,patm:S.patm,etiketDepo:S.etiketDepo}},null,1),'application/json'); bildir('Yedek dosyası indirildi.'); return; }
 
   // notlar
   if(t.id==='not-kaydet'){
